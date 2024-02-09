@@ -31,9 +31,10 @@ class UserController extends Controller
         $request->validate(['name'=>'required', 
             'email'=>'required',
             'password'=>'required']);        
-        $user = new Contact(['name' => $request->get('name'),
-        'password' => $request->get('last_name'),
-        'email' => $request->get('email')]);
+        $user = new Contact([
+            'name' => $request->get('name'),
+            'password' => $request->get('last_name'),
+            'email' => $request->get('email')]);
         $user->save();
         return redirect('/users')->with('success', 'User saved!');  
     }
