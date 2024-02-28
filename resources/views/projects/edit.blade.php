@@ -37,7 +37,11 @@
         </div>
 
         <div class="flex items-center gap-4">
+        <form method="post" action="{{ route('projects.edit', $project->id) }}" class="p-6">
+        @csrf
+            @method('put')
             <x-primary-button>{{ __('Save') }}</x-primary-button>
+</form>
             <form method="post" action="{{ route('projects.destroy', $project->id) }}" class="p-6">
             @csrf
             @method('delete')
