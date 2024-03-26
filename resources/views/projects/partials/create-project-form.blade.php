@@ -1,3 +1,11 @@
+@php
+    $users = App\Models\User::all(); // Fetch all users from the database
+    $userProps = [];
+
+    foreach ($users as $user) {
+        $userProps[$user->id] = $user->name;
+    }
+@endphp
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -22,9 +30,9 @@
         </div>
 
         <div>
-            <x-input-label for="status" :value="__('Project Status')" />
-            <x-text-input id="status" name="status" type="text" class="mt-1 block w-full" />
-            <x-input-error :messages="$errors->get('status')" class="mt-2" />
+            <x-input-label for="select_user" :value="__('Select User')" />
+            <x-select-input name="select_user" id="select_user" class="mt-1 block w-full" :options="$userProps" />
+            <x-input-error :messages="$errors->get('select_user')" class="mt-2" />
         </div>
 
         <div>

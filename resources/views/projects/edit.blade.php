@@ -5,10 +5,14 @@
         </h2>
     </x-slot>
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-2">
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-xl">
-    <form method="post" action="{{ route('projects.update', $project->id) }}" class="mt-6 space-y-6">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            Edit your project
+        </h2>
+    <form method="post" action="{{ route('projects.update', $project->id) }}" class="space-y-2">
         @csrf
         @method('PUT')
 
@@ -36,8 +40,12 @@
             <x-input-error :messages="$errors->get('status')" class="mt-2" />
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center">
+        <form method="post" action="{{ route('projects.edit', $project->id) }}" class="">
+        @csrf
+            @method('put')
             <x-primary-button>{{ __('Save') }}</x-primary-button>
+</form>
             <form method="post" action="{{ route('projects.destroy', $project->id) }}" class="p-6">
             @csrf
             @method('delete')
@@ -60,4 +68,15 @@
             </div>
         </div>
     </div>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-2 pb-12">
+            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="max-w-xl">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            Map tool
+        </h2>
+        <div class="bg-gray-50 h-56 w-full mt-3">
+</div>
+</div>
+</div>
+</div>
 </x-app-layout>

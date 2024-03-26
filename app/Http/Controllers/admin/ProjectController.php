@@ -39,7 +39,7 @@ class ProjectController extends Controller
             'irb_data' => $request->irb_data,
             'name' => $request->name,
             'status' => $request->status,
-            'owner_id' => $ownerId
+            'owner_id' => $request->select_user
         ]);
 
         return Redirect::route('projects.index');
