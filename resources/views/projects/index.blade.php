@@ -1,11 +1,12 @@
 @php
    $projectProps = [];
-
+   
 foreach ($projects as $project) {
+    $bgColor = $project->status === 'ACTIVE' ? 'bg-green-800' : 'bg-red-800';
     $projectProps[] = [
         'name' => $project->name,
         'type' => $project->type,
-        'status' => $project->status,
+        'status' => '<div class="' . $bgColor . ' w-fit rounded-xl text-white px-2 lowercase">' . $project->status . '</div>',
         'action' => '<a href="'.route('projects.edit', $project->id).'"><x-primary-button>Edit</x-primary-button></a>',
     ];
 }
