@@ -5,6 +5,7 @@ use App\Http\Controllers\admin\UsersController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\admin\ProjectController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,5 +36,20 @@ Route::apiResource('users', 'UserController');
 Route::resource('projects', ProjectController::class);
 Route::resource('attributes', AttributeController::class);
 Route::resource('users', UsersController::class);
+
+//temp map tool vies
+Route::get('/mapTool', function () {
+    return view('mapTool/index');
+});
+
+// temp solution to handle FC api calls
+Route::get('fcapi/initData', function() {
+	$response = Http::get('192.168.214.103:5000/initData');
+	// Your test logic here
+        // For example, print a message:
+	echo "User is authenticated!";
+	echo $response;
+});
+
 
 require __DIR__.'/auth.php';
