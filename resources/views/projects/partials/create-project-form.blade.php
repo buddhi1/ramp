@@ -1,10 +1,23 @@
 @php
     $users = App\Models\User::all(); // Fetch all users from the database
+    $attributes = App\Models\Attribute::all(); // Fetch all users from the database
     $userProps = [];
+    $attributeProps = [];
 
     foreach ($users as $user) {
         $userProps[$user->id] = $user->name;
     }
+
+    foreach ($attributes as $attribute) {
+        $attributeProps[$attribute->id] = $attribute->name;
+    }
+    $statusProps = [
+    'ACTIVE' => 'ACTIVE',
+    'INACTIVE' => 'INACTIVE',
+    'PENDING' => 'PENDING',
+    'COMPLETE' => 'COMPLETE',
+    // and so on...
+];
 @endphp
 <section>
     <header>
@@ -36,14 +49,31 @@
         </div>
 
         <div>
-            <x-input-label for="irb_data" :value="__('irb_data')" />
-            <x-text-input id="irb_data" name="irb_data" type="text" class="mt-1 block w-full" />
-            <x-input-error :messages="$errors->get('irb_data')" class="mt-2" />
+            <x-input-label for="select_attrbs[]" :value="__('Select Attributes')" />
+            <x-custom-select-input name="select_attrbs" class="mt-1 block w-full" id="select_attrbs" :options="$attributeProps" />
+            <x-input-error :messages="$errors->get('select_attrbs[]')" class="mt-2" />
         </div>
 
         <div>
+            <x-input-label for="irb_data" :value="__('Irb Data')" />
+            <x-text-input id="irb_data" name="irb_data" type="text" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->get('irb_data')" class="mt-2" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+        <div>
+            <x-input-label for="start_date" :value="__('Start Date')" />
+            <x-date-input id="start_date" name="start_date" type="date" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
+        </div>
+        <div>
+            <x-input-label for="end_date" :value="__('End Date')" />
+            <x-date-input id="end_date" name="end_date" type="date" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->get('end_date')" class="mt-2" />
+        </div>
+        </div>
+        <div>
             <x-input-label for="status" :value="__('Project Status')" />
-            <x-text-input id="status" name="status" type="text" class="mt-1 block w-full" />
+            <x-select-input name="status" id="status" class="mt-1 block w-full" :options="$statusProps" />
             <x-input-error :messages="$errors->get('status')" class="mt-2" />
         </div>
 
