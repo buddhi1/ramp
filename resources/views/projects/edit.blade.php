@@ -52,7 +52,7 @@ $selectedAttributeIds = $project->attributes->pluck('id')->toArray();
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Define data policy for a project. Which data are available for a project..') }}
             </p>
-            <x-custom-select-input name="select_attrbs" class="mt-1 block w-full" id="select_attrbs" :options="$attributeProps" :selected="$selectedAttributeIds" />
+            <x-custom-select-input name="select_attrbs[]" class="mt-1 block w-full" id="select_attrbs[]" :options="$attributeProps" :selected="$selectedAttributeIds" />
             <x-input-error :messages="$errors->get('select_attrbs[]')" class="mt-2" />
         </div>
 
