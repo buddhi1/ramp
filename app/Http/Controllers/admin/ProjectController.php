@@ -118,21 +118,23 @@ class ProjectController extends Controller
             'irb_data' => $request->input('irb_data'),
         ]);
 
-        $attrbs = json_encode($request->select_attrbs);
-        $attrbsArray = json_decode($attrbs, true);
+        if ($request->has('select_attrbs')) {
+            $attrbs = json_encode($request->select_attrbs);
+            $attrbsArray = json_decode($attrbs, true);
 
-        DataPolicy::where('project_id', $project->id)->delete();
+            DataPolicy::where('project_id', $project->id)->delete();
 
-        $data = [];
-        foreach ($attrbsArray as $attrb) {
-            $data[] = [
-                'project_id' => $project->id,
-                'data_attr_id' => $attrb
-            ];
+            $data = [];
+            foreach ($attrbsArray as $attrb) {
+                $data[] = [
+                    'project_id' => $project->id,
+                    'data_attr_id' => $attrb
+                ];
+            }
+
+            // Insert updated data policies
+            DataPolicy::insert($data);
         }
-
-        // Insert updated data policies
-        DataPolicy::insert($data);
 
         return Redirect::route('projects.edit', ['project' => $project->id])->with('status', 'project-updated');
     }
