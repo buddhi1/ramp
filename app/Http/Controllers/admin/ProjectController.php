@@ -53,7 +53,7 @@ class ProjectController extends Controller
         if ($start_time_epoch > $end_time_epoch) {
             return redirect()->back()->withInput()->withErrors(['start_time' => 'Start time cannot be greater than end time']);
         }
-        // this is no consoleand debig
+        // this is to console and debug
         function debug_to_console($data)
         {
 
