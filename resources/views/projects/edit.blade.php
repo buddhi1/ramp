@@ -16,6 +16,12 @@ $selectedAttributeIds = $project->attributes->pluck('id')->toArray();
     'COMPLETE' => 'COMPLETE',
     // and so on...
 ];
+
+$typeProps = [
+    'PUBLIC' => 'PUBLIC',
+    'PRIVATE' => 'PRIVATE',
+    // and so on...
+];
 @endphp
 <x-app-layout>
     <x-slot name="header">
@@ -43,7 +49,7 @@ $selectedAttributeIds = $project->attributes->pluck('id')->toArray();
 
         <div>
             <x-input-label for="type" :value="__('Type')" />
-            <x-text-input id="type" name="type" type="text" class="mt-1 block w-full" value="{{ $project->type }}" required autofocus autocomplete="type" />
+            <x-select-input name="type" id="type" class="mt-1 block w-full" :options="$typeProps" :selected="$project->type" />
             <x-input-error class="mt-2" :messages="$errors->get('type')" />
         </div>
 
@@ -52,7 +58,7 @@ $selectedAttributeIds = $project->attributes->pluck('id')->toArray();
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                 {{ __('Define data policy for a project. Which data are available for a project..') }}
             </p>
-            <x-custom-select-input name="select_attrbs" class="mt-1 block w-full" id="select_attrbs" :options="$attributeProps" :selected="$selectedAttributeIds" />
+            <x-custom-select-input name="select_attrbs[]" class="mt-1 block w-full" id="select_attrbs[]" :options="$attributeProps" :selected="$selectedAttributeIds" />
             <x-input-error :messages="$errors->get('select_attrbs[]')" class="mt-2" />
         </div>
 

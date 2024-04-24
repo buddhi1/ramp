@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Redirect;
 // }
 class ProjectController extends Controller
 {
-    public function index() 
+    public function index()
     {
         $userId = Auth::id();
 
@@ -49,15 +49,16 @@ class ProjectController extends Controller
 
         $start_time_epoch = strtotime($request->start_time) * 1000;
         $end_time_epoch = strtotime($request->end_time) * 1000;
+
+        if ($start_time_epoch > $end_time_epoch) {
+            return redirect()->back()->withInput()->withErrors(['start_time' => 'Start time cannot be greater than end time']);
+        }
+        // this is to console and debug
         function debug_to_console($data)
         {
-            $output = $data;
-            if (is_array($output))
-                $output = implode(',', $output);
 
-            echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
+            echo "<script>console.log('Debug Objects: " . $data . "' );</script>";
         }
-        $ownerId = Auth::id();
         $attrbs = json_encode($request->select_attrbs);
         debug_to_console(json_encode($request->select_attrbs));
         $project = Project::create([
@@ -71,8 +72,6 @@ class ProjectController extends Controller
         ]);
 
         $attrbsArray = json_decode($attrbs, true);
-        
-        // Prepare an array of data for each record
         $data = [];
         foreach ($attrbsArray as $attrb) {
             $data[] = [
@@ -90,9 +89,9 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
         $project->attributes = DataPolicy::where('project_id', $project->id)
-        ->join('attributes', 'data_policies.data_attr_id', '=', 'attributes.id')
-        ->select('attributes.name', 'attributes.id')
-        ->get();
+            ->join('attributes', 'data_policies.data_attr_id', '=', 'attributes.id')
+            ->select('attributes.name', 'attributes.id')
+            ->get();
 
         return view('projects.edit', compact('project'));
     }
@@ -107,7 +106,8 @@ class ProjectController extends Controller
         if ($start_time_epoch > $end_time_epoch) {
             return redirect()->back()->withInput()->withErrors(['start_time' => 'Start time cannot be greater than end time']);
         }
-        
+
+
         $project->update([
             'name' => $request->input('name'),
             'type' => $request->input('type'),
@@ -116,6 +116,24 @@ class ProjectController extends Controller
             'end_time' => $end_time_epoch,
             'irb_data' => $request->input('irb_data'),
         ]);
+
+        if ($request->has('select_attrbs')) {
+            $attrbs = json_encode($request->select_attrbs);
+            $attrbsArray = json_decode($attrbs, true);
+
+            DataPolicy::where('project_id', $project->id)->delete();
+
+            $data = [];
+            foreach ($attrbsArray as $attrb) {
+                $data[] = [
+                    'project_id' => $project->id,
+                    'data_attr_id' => $attrb
+                ];
+            }
+
+            // Insert updated data policies
+            DataPolicy::insert($data);
+        }
 
         return Redirect::route('projects.edit', ['project' => $project->id])->with('status', 'project-updated');
     }

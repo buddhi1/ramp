@@ -18,6 +18,12 @@
     'COMPLETE' => 'COMPLETE',
     // and so on...
 ];
+
+$typeProps = [
+    'PUBLIC' => 'PUBLIC',
+    'PRIVATE' => 'PRIVATE',
+    // and so on...
+];
 @endphp
 <section>
     <header>
@@ -38,7 +44,7 @@
 
         <div>
             <x-input-label for="type" :value="__('Type')" />
-            <x-text-input id="type" name="type" type="text" class="mt-1 block w-full" required autofocus autocomplete="type" />
+            <x-select-input name="type" id="type" class="mt-1 block w-full" :options="$typeProps" />
             <x-input-error class="mt-2" :messages="$errors->get('type')" />
         </div>
 
@@ -50,7 +56,7 @@
 
         <div>
             <x-input-label for="select_attrbs[]" :value="__('Select Attributes')" />
-            <x-custom-select-input name="select_attrbs" class="mt-1 block w-full" id="select_attrbs" :options="$attributeProps" />
+            <x-custom-select-input name="select_attrbs[]" class="mt-1 block w-full" id="select_attrbs[]" :options="$attributeProps" />
             <x-input-error :messages="$errors->get('select_attrbs[]')" class="mt-2" />
         </div>
 
@@ -61,14 +67,14 @@
         </div>
         <div class="grid grid-cols-2 gap-2">
         <div>
-            <x-input-label for="start_date" :value="__('Start Date')" />
-            <x-date-input id="start_date" name="start_date" type="date" class="mt-1 block w-full" />
-            <x-input-error :messages="$errors->get('start_date')" class="mt-2" />
+            <x-input-label for="start_time" :value="__('Start Time')" />
+            <x-date-input id="start_time" name="start_time" type="date" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->get('start_time')" class="mt-2" />
         </div>
         <div>
-            <x-input-label for="end_date" :value="__('End Date')" />
-            <x-date-input id="end_date" name="end_date" type="date" class="mt-1 block w-full" />
-            <x-input-error :messages="$errors->get('end_date')" class="mt-2" />
+            <x-input-label for="end_time" :value="__('End Time')" />
+            <x-date-input id="end_time" name="end_time" type="date" class="mt-1 block w-full" />
+            <x-input-error :messages="$errors->get('end_time')" class="mt-2" />
         </div>
         </div>
         <div>
