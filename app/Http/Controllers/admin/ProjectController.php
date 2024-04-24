@@ -71,7 +71,7 @@ class ProjectController extends Controller
         ]);
 
         $attrbsArray = json_decode($attrbs, true);
-
+        
         // Prepare an array of data for each record
         $data = [];
         foreach ($attrbsArray as $attrb) {

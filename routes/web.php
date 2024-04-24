@@ -45,10 +45,7 @@ Route::get('/mapTool', function () {
 // temp solution to handle FC api calls
 Route::get('fcapi/initData', function() {
 	$response = Http::get('192.168.214.103:5000/initData');
-	// Your test logic here
-        // For example, print a message:
-	echo "User is authenticated!";
-	echo $response;
+	return $response;
 });
 
 
