@@ -1,3 +1,5 @@
+var url='http://localhost:8008/fcapi'
+
 window.onload = function() {
     fetchTripsAndRender();
 };
@@ -18,6 +20,18 @@ async function fetchTripsAndRender() {
     catch (error) {
         console.error('Could not fetch trips:', error);
     }
+
+    // var response=await fetch(url+'/trips')
+    // // .then((response) => renderScooterTrips(response.json()))
+    // // //.then((data) => console.log(data))
+    // // .catch((error) => console.error("Error fetching data:", error));
+
+    // const trips = await response.json();
+    // console.log(trips)
+    // // Call renderScooterTrips with fetched data
+    // renderScooterTrips(trips);
+
+    
 }
 //take the fetched trip data and visualize it on the map.
 function renderScooterTrips(trips) {

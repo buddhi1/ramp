@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //   console.log("Initial Data:", data);
     // })
     .catch((error) => console.error("Error fetching initial data:", error));
+
 });
 
 // Get trips filtered by sensor data

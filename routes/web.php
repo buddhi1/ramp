@@ -48,5 +48,11 @@ Route::get('fcapi/initData', function() {
 	return $response;
 });
 
+// temp solution to handle FC api calls
+Route::get('fcapi/trips', function() {
+	$response = Http::get('192.168.214.103:5000/trips');
+	return $response;
+});
+
 
 require __DIR__.'/auth.php';
