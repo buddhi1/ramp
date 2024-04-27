@@ -40,8 +40,10 @@ html, body, #viewDiv {
 }
 .icon {
     position: fixed;
-    top: 50px;
-    right: 50px;
+    /* top: 50px;
+    right: 50px; */
+    top: 1rem;
+    right: 2rem;
     cursor: pointer;
     color: #454545;
     font-size: 24px;
@@ -187,3 +189,4 @@ input[type="range"]:active::-webkit-slider-thumb{
     border-radius: 5px;
 
 }
+

@@ -1,35 +1,36 @@
-var url='http://localhost:8008/fcapi'
+var url='http://localhost:8008/fcapi';
+var gminx, gminy, gmaxx, gmaxy;
 
 window.onload = function() {
     fetchTripsAndRender();
 };
 
 async function fetchTripsAndRender() {
-    try {
-        // Path to the JSON file which contains the trip data
-        const response = await fetch('/data/trips.json'); 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const trips = await response.json();
-        console.log(trips)
-        // Call renderScooterTrips with fetched data
-        renderScooterTrips(trips); 
-    } 
-    //Error handling is implemented to log issues if the fetch request fails.
-    catch (error) {
-        console.error('Could not fetch trips:', error);
-    }
+    // try {
+    //     // Path to the JSON file which contains the trip data
+    //     const response = await fetch('/data/trips.json'); 
+    //     if (!response.ok) {
+    //         throw new Error(`HTTP error! status: ${response.status}`);
+    //     }
+    //     const trips = await response.json();
+    //     console.log(trips)
+    //     // Call renderScooterTrips with fetched data
+    //     renderScooterTrips(trips); 
+    // } 
+    // //Error handling is implemented to log issues if the fetch request fails.
+    // catch (error) {
+    //     console.error('Could not fetch trips:', error);
+    // }
 
-    // var response=await fetch(url+'/trips')
-    // // .then((response) => renderScooterTrips(response.json()))
-    // // //.then((data) => console.log(data))
-    // // .catch((error) => console.error("Error fetching data:", error));
+    var response=await fetch(url+'/trips')
+    // .then((response) => renderScooterTrips(response.json()))
+    // //.then((data) => console.log(data))
+    // .catch((error) => console.error("Error fetching data:", error));
 
-    // const trips = await response.json();
-    // console.log(trips)
-    // // Call renderScooterTrips with fetched data
-    // renderScooterTrips(trips);
+    const trips = await response.json();
+    console.log(trips)
+    // Call renderScooterTrips with fetched data
+    renderScooterTrips(trips);
 
     
 }
@@ -42,38 +43,58 @@ function renderScooterTrips(trips) {
         "esri/widgets/Search",
         "esri/Graphic",
         "esri/layers/GraphicsLayer",
+        "esri/geometry/Extent",
+
+        "esri/geometry/SpatialReference",
     
         "esri/widgets/BasemapToggle",
         "esri/widgets/BasemapGallery",
         "esri/widgets/Expand"
     
-        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, BasemapToggle, BasemapGallery, Expand) {
+        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand) {
             esriConfig.apiKey="AAPK7c7d215fcd9848cb80732ee818643c4dup3DhD1dsH1W--DI1Mh8vEFyp0faPvPhi2POkUdUUpPBjP8HcEzkxwKimIOeFngf";
     
         const map = new Map({
             basemap: "streets-navigation-vector"
         });
     
-        const view = new MapView({
-            map: map,
-            center: [-98.61947, 29.58553], //Longitude, latitude
-            zoom: 15,
-            container: "viewDiv"
-        });
-    
         const graphicsLayer = new GraphicsLayer();
         map.add(graphicsLayer);
     
         trips.forEach((trip, i) => {
-            let deltaX = 0;
-            let deltaY = 0;
+            let deltaX = i*10;
+            let deltaY = i*10;
             let b = 140 + i * 20; // Change the color slightly for each trip
     
             graphicsLayer.add(getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b));
         });
+
+        const view = new MapView({
+            map: map,
+            // center: [-98.61947, 29.58553], //Longitude, latitude
+            // zoom: 15,
+            container: "viewDiv"
+        });
+        // console.log(gminx, gminy, gmaxx, gmaxy)
+        // the projection engine must be loaded in the app if the spatial reference
+        // of the view does not match the spatial reference of the extent
+        const extent = new Extent({
+            ymin:  gminy,
+            xmin:  gminx,
+            ymax:  gmaxy,
+            xmax:  gmaxx,
+            // spatialReference: new SpatialReference({wkid:3857})
+            // spatialReference: SpatialReference.WGS84
+        });
+        view.extent = extent;  // Updates the view without animation                                      
+
         // Adding map utilities
         // places the logo div in the bottom right corner of the view
         view.ui.add("logoDiv", "bottom-right");
+
+        view.popup = {
+           
+        };
     
         const search = new Search({
             view: view
@@ -103,7 +124,7 @@ function renderScooterTrips(trips) {
             content: basemapGallery
         });
     
-        view.ui.add(bgExpand, "top-right");
+        view.ui.add(bgExpand, "top-left");
     });
 }
 
@@ -111,10 +132,42 @@ function renderScooterTrips(trips) {
 //Converts GPS data points into a format suitable for polyline creation in ArcGIS.
 function getGpsPath(gpsData, deltaX = 0, deltaY = 0) {
     const gpsPath = [];
+    // console.log("test data")
+    // console.log(gpsData.latitude, gpsData.longitude)
 
-    for (let i = 0; i < gpsData.latitude.length; i++) {
-        gpsPath.push([gpsData.longitude[i] + deltaX, gpsData.latitude[i] + deltaY]);
+    var minx=(gpsData.longitude[0] + deltaX)/-100, miny=(gpsData.latitude[0] + deltaY)/100;
+    var maxx=(gpsData.longitude[0] + deltaX)/-100, maxy=(gpsData.latitude[0] + deltaY)/100;
+    for (let i = 0; i < gpsData.longitude.length; i++) {
+        gpsPath.push([(gpsData.longitude[i] + deltaX)/-100, (gpsData.latitude[i] + deltaY)/100]);
+
+        //remove in the production. This data will be provided from the API
+        if(minx>gpsPath[i][0])
+            minx=gpsPath[i][0];
+        if(miny>gpsPath[i][1])
+            miny=gpsPath[i][1];
+        if(maxx<gpsPath[i][0])
+            maxx=gpsPath[i][0];
+        if(maxy<gpsPath[i][1])
+            maxy=gpsPath[i][1];
     }
+
+    // if first entry
+    if(deltaX==0){
+        gminx=minx;
+        gminy=miny;
+        gmaxx=maxx;
+        gmaxy=maxy;
+    }else{
+        if(gminx>minx)
+            gminx=minx;
+        if(gminy>miny)
+            gminy=miny;
+        if(gmaxx<maxx)
+            gmaxx=maxx;
+        if(gmaxy<maxy)
+            gmaxy=maxy;
+    }
+    // console.log(gpsPath)
     return gpsPath;
 }
 
@@ -155,9 +208,9 @@ function getScooterTripInfo(trip) {
         Min_speed: trip.min_speed + " kmph",
         Start_battery_status: trip.start_battery_status + " %",
         End_battery_status: trip.end_battery_status + " %",
-        Stops: trip.stops,
         Video: trip.video_link,
-        Audio: trip.audio_link
+        Audio: trip.audio_link,
+        Stops: trip.stops
     };
 
     tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.acc_x, "ax"));
@@ -191,7 +244,7 @@ function getSamplingRate(size, label) {
 
 function getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b) {
     const attributes = getScooterTripInfo(trip);
-    console.log(trip.sensor_data.acc_x)
+    console.log(trip)
     //a polyline graphic is created and added to the map.
     const polylineGraphic = new Graphic({
         geometry: {
