@@ -18,7 +18,7 @@ foreach ($users as $user) {
         </h2>
     </x-slot>
     <div class="py-12">
-    <div class="max-w-7xl mx-auto lg:px-8 space-y-6">
+    <div class="w-full mx-auto lg:px-8 space-y-6">
             <div class="sm:p-0 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <!-- <div class="max-w-xl"> -->
                 <x-table :data="$userProps" :headers="['Name', 'Email', 'Role', 'Status', 'Actions']" />
