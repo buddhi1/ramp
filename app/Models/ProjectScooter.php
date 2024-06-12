@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Project extends Model
+class ProjectScooter extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name', 'type', 'status', 'irb_data', 'start_time', 'end_time', 'owner_id', 'fleet_number',
+        'project_id', // Add project_id to the fillable array
+        'scooter_id',
     ];
 }

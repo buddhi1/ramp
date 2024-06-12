@@ -18,11 +18,14 @@ foreach ($projects as $project) {
         </h2>
     </x-slot>
     <div class="py-12">
-    <div class="max-w-7xl mx-auto lg:px-8 space-y-6">
+    <div class="w-full mx-auto lg:px-8 space-y-6">
             <div class="sm:p-0 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <!-- <div class="max-w-xl"> -->
                 <x-table :data="$projectProps" :headers="['Name', 'Type', 'Status', 'Actions']" />
                 <!-- </div> -->
+                <div class="m-4">
+                    {{ $projects->links() }}
+                </div>
             </div>
         </div>
     </div>

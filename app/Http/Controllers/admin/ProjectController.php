@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Models\Attribute;
 use App\Models\DataPolicy;
 use App\Models\Project;
+use App\Models\ProjectScooter;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class ProjectController extends Controller
         $userId = Auth::id();
 
         // Fetch projects belonging to the current user
-        $projects = Project::where('owner_id', $userId)->get();
+        $projects = Project::where('owner_id', $userId)->latest()->paginate(10);
         return view('projects.index', compact('projects'));
     }
 
@@ -44,7 +45,9 @@ class ProjectController extends Controller
             'start_time' => 'required',
             'end_time' => 'required',
             'irb_data' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'fleet_number' => 'required',
+            'scooters' => 'required|array', // Validate scooters as an array
         ]);
 
         $start_time_epoch = strtotime($request->start_time) * 1000;
@@ -68,8 +71,16 @@ class ProjectController extends Controller
             'status' => $request->status,
             'start_time' => $start_time_epoch,
             'end_time' => $end_time_epoch,
-            'owner_id' => $request->select_user
+            'owner_id' => $request->select_user,
+            'fleet_number' => $request->fleet_number
         ]);
+
+        for ($i = 0; $i < $request->fleet_number; $i++) {
+            ProjectScooter::firstOrCreate([
+                'project_id' => $project->id,
+                'scooter_id' => $i,
+            ]);
+        }
 
         $attrbsArray = json_decode($attrbs, true);
         $data = [];
@@ -115,6 +126,7 @@ class ProjectController extends Controller
             'start_time' => $start_time_epoch,
             'end_time' => $end_time_epoch,
             'irb_data' => $request->input('irb_data'),
+            'fleet_number' => $request->input('fleet_number'),
         ]);
 
         if ($request->has('select_attrbs')) {
