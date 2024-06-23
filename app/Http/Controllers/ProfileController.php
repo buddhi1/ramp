@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -40,21 +42,34 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, $userId): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         $user = $request->user();
+        $userToDelete = User::findOrFail($userId);
 
-        Auth::logout();
+        if ($user->id !== $userToDelete->id) {
+            // Check if the current user is an admin
+            if (Gate::denies('create-user')) {
+                abort(401, 'Unauthotized');
+            } else {
+                $userToDelete->delete();
+                return Redirect::to('/dashboard');
+            }
+        } else {
+            Auth::logout();
 
-        $user->delete();
+            $userToDelete->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+            return Redirect::to('/');
+        }
+
+
     }
 }

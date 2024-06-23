@@ -5,7 +5,7 @@ foreach ($users as $user) {
     $userProps[] = [
         'name' => $user->name,
         'type' => $user->email,
-        'role' => "ADMIN",
+        'role' => $user->roles[0]->name,
         'status' => "ACTIVE",
         'action' => '<a href="'.route('users.edit', $user->id).'"><x-primary-button>Edit</x-primary-button></a>',
     ];

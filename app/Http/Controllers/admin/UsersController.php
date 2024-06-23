@@ -18,7 +18,7 @@ class UsersController extends Controller
         $userId = Auth::id();
 
         // Fetch projects belonging to the current user
-        $users = User::get();
+        $users = User::with('roles')->get();
         return view('users.index', compact('users'));
     }
 
