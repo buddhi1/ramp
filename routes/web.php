@@ -29,13 +29,16 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::apiResource('users', 'UserController');
 Route::resource('projects', ProjectController::class);
-Route::resource('attributes', AttributeController::class);
-Route::resource('users', UsersController::class);
+
+Route::middleware('admin')->group(function () {
+    Route::resource('attributes', AttributeController::class);
+    Route::resource('users', UsersController::class);
+});
 
 //temp map tool vies
 Route::get('/mapTool', function () {
@@ -43,16 +46,16 @@ Route::get('/mapTool', function () {
 });
 
 // temp solution to handle FC api calls
-Route::get('fcapi/initData', function() {
-	$response = Http::get('192.168.214.103:5000/initData');
-	return $response;
+Route::get('fcapi/initData', function () {
+    $response = Http::get('192.168.214.103:5000/initData');
+    return $response;
 });
 
 // temp solution to handle FC api calls
-Route::get('fcapi/trips', function() {
-	$response = Http::get('192.168.214.103:5000/trips');
-	return $response;
+Route::get('fcapi/trips', function () {
+    $response = Http::get('192.168.214.103:5000/trips');
+    return $response;
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

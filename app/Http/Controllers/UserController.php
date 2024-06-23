@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use Illuminate\Http\Request;
-use App\User;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -28,13 +30,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+
+        if(Gate::denies('create-user')){
+            abort(401, 'Unauthotized');
+        };
+        
         $request->validate(['name'=>'required', 
             'email'=>'required',
             'password'=>'required']);        
-        $user = new Contact([
+        $user = new User([
             'name' => $request->get('name'),
             'password' => $request->get('last_name'),
             'email' => $request->get('email')]);
+        // asign default role user when user is created
+        $user->assignRole(Role::where('name', 'User')->first());
+
         $user->save();
         return redirect('/users')->with('success', 'User saved!');  
     }

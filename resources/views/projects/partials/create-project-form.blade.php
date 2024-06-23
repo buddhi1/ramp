@@ -4,10 +4,16 @@
     $userProps = [];
     $attributeProps = [];
     $fleet_number = 0;
+    $currentuser = Auth::user();
+    if ($currentuser->hasRole('ADMIN')) {
+        foreach ($users as $user) {
+            $userProps[$user->id] = $user->name;
+        }
+    } else {
+        $userProps[$currentuser->id] = $currentuser->name;
 
-    foreach ($users as $user) {
-        $userProps[$user->id] = $user->name;
     }
+
 
     foreach ($attributes as $attribute) {
         $attributeProps[$attribute->id] = $attribute->name;
@@ -158,13 +164,13 @@
             </div>
 
 
-            <div class="cursor-none">
+            <!-- <div class="cursor-none">
                 <x-input-label for="scooters" :value="__('Select Scooters')" />
                 <x-custom-select-input name="scooters[]"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" id="scooters[]"
                     :options="$scooterProps" multiple />
                 <x-input-error :messages="$errors->get('scooters[]')" class="mt-2" />
-            </div>
+            </div> -->
         </div>
 
         <div class="flex items-right justify-end gap-4 mt-6">
