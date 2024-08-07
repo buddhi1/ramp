@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\admin\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\DownloadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
 
 Route::apiResource('users', 'UserController');
 Route::resource('projects', ProjectController::class);
+Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
 
 Route::middleware('admin')->group(function () {
     Route::resource('attributes', AttributeController::class);
