@@ -24,10 +24,14 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
-
+        $user = Auth::user();
+        if ($user->hasRole('ADMIN')) {
+            $projects = Project::latest()->paginate(10);
+        } else {
+            $projects = Project::where('owner_id', $user->id)->latest()->paginate(10);
+        }
         // Fetch projects belonging to the current user
-        $projects = Project::where('owner_id', $userId)->latest()->paginate(10);
+
         return view('projects.index', compact('projects'));
     }
 
@@ -47,7 +51,7 @@ class ProjectController extends Controller
             'irb_data' => 'required',
             'status' => 'required',
             'fleet_number' => 'required',
-            'scooters' => 'required|array', // Validate scooters as an array
+            // 'scooters' => 'required|array', // Validate scooters as an array
         ]);
 
         $start_time_epoch = strtotime($request->start_time) * 1000;
@@ -98,7 +102,13 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        $this->authorize('update', $project);
+        $user = Auth::user();
+        if ($user->hasRole('ADMIN')) {
+
+        } else {
+            $this->authorize('update', $project);
+        }
+
         $project->attributes = DataPolicy::where('project_id', $project->id)
             ->join('attributes', 'data_policies.data_attr_id', '=', 'attributes.id')
             ->select('attributes.name', 'attributes.id')
@@ -109,7 +119,12 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project)
     {
-        $this->authorize('update', $project);
+        $user = Auth::user();
+        if ($user->hasRole('ADMIN')) {
+
+        } else {
+            $this->authorize('update', $project);
+        }
 
         $start_time_epoch = strtotime($request->input('start_time')) * 1000;
         $end_time_epoch = strtotime($request->input('end_time')) * 1000;
