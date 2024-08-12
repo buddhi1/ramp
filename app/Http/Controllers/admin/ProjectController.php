@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Exports\JsontoExcelExport;
 use App\Models\Attribute;
 use App\Models\DataPolicy;
 use App\Models\Project;
@@ -11,6 +12,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 // function debug_to_console($data)
 // {
@@ -163,6 +166,27 @@ class ProjectController extends Controller
         }
 
         return Redirect::route('projects.edit', ['project' => $project->id])->with('status', 'project-updated');
+    }
+
+    public function download(Request $request, Project $project)
+    {
+        $type = $request->input('file_type');
+
+        switch ($type) {
+            case 'JSON':
+                //currently loading sample json
+                $filePath = storage_path('app/trips.json');
+               return response()->download($filePath);
+            case 'CSV':
+                $json = Storage::get('trips.json');
+                $data = json_decode($json, true);
+                return Excel::download(new JsontoExcelExport($data), 'trips.xlsx');
+                // break;
+            default:
+                return Redirect::route('projects.edit', ['project' => $project->id])->with('status', 'Something went wrong, try again.');
+        }
+
+        // return response()->download($filePath);
     }
 
     public function destroy(Project $project)

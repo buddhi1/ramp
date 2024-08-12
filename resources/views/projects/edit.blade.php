@@ -10,13 +10,19 @@
     $end_time = $project->end_time; // Example epoch timestamp
     $selectedStatus = $project->status;
     echo "<script>
-                console.log('Debug Objects: " . $start_time . "');
-                </script>";
+                                                                    console.log('Debug Objects: " . $start_time . "');
+                                                                    </script>";
     $statusProps = [
         'ACTIVE' => 'ACTIVE',
         'INACTIVE' => 'INACTIVE',
         'PENDING' => 'PENDING',
         'COMPLETE' => 'COMPLETE',
+        // and so on...
+    ];
+
+    $downloadTypes = [
+        'CSV' => 'CSV',
+        'JSON' => 'JSON'
         // and so on...
     ];
 
@@ -174,12 +180,39 @@
     <div class="w-full mx-auto sm:px-6 lg:px-8 space-y-2 pb-12">
         <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
             <div class="max-w-xl">
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Map tool
-                </h2>
-                <div class="bg-gray-50 h-56 w-full mt-3">
+                <div class="">
+                    <div>
+                        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                            Map tool
+                        </h2>
+                    </div>
+
+                </div>
+                <div class="bg-gray-50 h-56 mt-3">
                 </div>
             </div>
+            <hr class="m-5"/>
+            <form action="{{ route('projects.download', $project->id) }}" method="POST">
+                @csrf
+                <div class="my-5 flex">
+                    <div class="w-[200px]">
+                        <x-input-label for="file_type" :value="__('Select File Type')" />
+                        <x-select-input name="file_type" id="file_type" class="mt-1 block w-full"
+                            :options="$downloadTypes" />
+                    </div>
+                    <div class="mt-9 ml-4"><x-primary-button type="submit">{{ __('Download') }}</x-primary-button></div>
+                    <div class="my-5 flex"></div>
+            </form>
+            @if (session('status') === 'download-error')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-gray-600 dark:text-gray-400">{{ __('Error downloading your data.') }}</p>
+            @endif
+
+            @if (session('status') === 'download-success')
+                <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
+                    class="text-sm text-gray-600 dark:text-gray-400">{{ __('Download complete') }}</p>
+            @endif
+            <!-- </div> -->
         </div>
     </div>
 </x-app-layout>
