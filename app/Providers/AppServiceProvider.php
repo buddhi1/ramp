@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('create-user', function ($user) {
-            return $user->hasRole('ADMIN');
+            return $user->isAdmin();
         });
     }
 }

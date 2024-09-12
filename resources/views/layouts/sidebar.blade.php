@@ -1,6 +1,6 @@
 @php
    $user = Auth::user();
-   $isAdmin = $user->hasRole('ADMIN');
+   $isAdmin = $user->isAdmin();
    if ($isAdmin) {
       $projects_count = App\Models\Project::count();
    } else {

@@ -5,7 +5,7 @@
     $attributeProps = [];
     $fleet_number = 0;
     $currentuser = Auth::user();
-    if ($currentuser->hasRole('ADMIN')) {
+    if ($currentuser->isAdmin()) {
         foreach ($users as $user) {
             $userProps[$user->id] = $user->name;
         }

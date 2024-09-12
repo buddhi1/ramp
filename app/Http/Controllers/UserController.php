@@ -40,7 +40,7 @@ class UserController extends Controller
             'password'=>'required']);        
         $user = new User([
             'name' => $request->get('name'),
-            'password' => $request->get('last_name'),
+            'password' => $request->get('password'),
             'email' => $request->get('email')]);
         // asign default role user when user is created
         $user->assignRole(Role::where('name', 'User')->first());

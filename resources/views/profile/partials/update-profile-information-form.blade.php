@@ -1,3 +1,11 @@
+@php
+    $roles = App\Models\Role::all();
+    $rolesProps = [];
+    foreach ($roles as $role) {
+        $rolesProps[$role->id] = $role->name;
+    }
+@endphp
+
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -45,6 +53,13 @@
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div>
+            <x-input-label for="role" :value="__('Role')" />
+            <x-select-input name="role" id="role"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" :selected="old('name', $user->role)" :options="$rolesProps" />
+            <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 
         <div class="flex items-center gap-4">
