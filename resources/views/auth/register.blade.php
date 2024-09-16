@@ -1,3 +1,10 @@
+@php
+    $roles = App\Models\Role::all();
+    $rolesProps = [];
+    foreach ($roles as $role) {
+        $rolesProps[$role->id] = $role->name;
+    }
+@endphp
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
@@ -14,6 +21,13 @@
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="role" :value="__('Role')" />
+            <x-select-input name="role" id="role"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" :options="$rolesProps" />
+            <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 
         <!-- Password -->
@@ -40,9 +54,9 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
+            <!-- <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
-            </a>
+            </a> -->
 
             <x-primary-button class="ms-4">
                 {{ __('Register') }}

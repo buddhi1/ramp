@@ -27,12 +27,26 @@
             <x-text-input id="description" name="description" type="text" class="mt-1 block w-full" value="{{ $attribute->description }}" />
             <x-input-error :messages="$errors->get('description')" class="mt-2" />
         </div>
-
         <div>
-            <x-input-label for="data" :value="__('Attribute data')" />
-            <x-text-input id="data" name="data" type="text" class="mt-1 block w-full" value="{{ $attribute->data }}" />
-            <x-input-error :messages="$errors->get('data')" class="mt-2" />
+            <x-input-label for="data" :value="__('Data (Measurement units)')" />
+            <div id="data-wrapper">
+                @if (!empty($attribute->data))
+                    @foreach (json_decode($attribute->data) as $dataItem)
+                        <div class="flex gap-3 mt-2">
+                            <x-text-input name="data[]" type="text" value="{{ $dataItem }}" class="mt-1 block w-full" readonly />
+                            <x-primary-button type="button" class="remove-data-btn">{{ __('-') }}</x-primary-button>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            
+            <div class="flex gap-3 mt-2">
+                <x-text-input id="new-data" type="text" class="mt-1 block w-full" placeholder="Enter new value" />
+                <x-primary-button type="button" id="add-data-btn">{{ __('+') }}</x-primary-button>
+            </div>
+            <x-input-error class="mt-2" :messages="$errors->get('data')" />
         </div>
+
 
         <div class="flex items-center">
         <form method="post" action="{{ route('attributes.edit', $attribute->id) }}" class="">
@@ -67,3 +81,38 @@
 </div>
 </div>
 </x-app-layout>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dataWrapper = document.getElementById('data-wrapper');
+        const newDataInput = document.getElementById('new-data');
+
+        document.getElementById('add-data-btn').addEventListener('click', function () {
+            const newValue = newDataInput.value.trim();
+
+            // Only add non-empty values
+            if (newValue !== '') {
+                const newInputDiv = document.createElement('div');
+                newInputDiv.classList.add('flex', 'gap-3', 'mt-2');
+                newInputDiv.innerHTML = `
+                    <x-text-input name="data[]" type="text" value="${newValue}" class="mt-1 block w-full" readonly />
+                    <x-primary-button type="button" class="remove-data-btn">{{ __('-') }}</x-primary-button>
+                `;
+
+                dataWrapper.appendChild(newInputDiv);
+
+                newInputDiv.querySelector('.remove-data-btn').addEventListener('click', function () {
+                    dataWrapper.removeChild(newInputDiv);
+                });
+
+                newDataInput.value = '';
+            }
+        });
+        document.querySelectorAll('.remove-data-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const inputDiv = btn.parentElement;
+                dataWrapper.removeChild(inputDiv);
+            });
+        });
+    });
+</script>

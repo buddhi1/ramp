@@ -2,10 +2,20 @@
    $attrbsProps = [];
 
 foreach ($attributes as $attrb) {
+    $dataDivs = ''; // Initialize a string to store the div elements for each data item
+
+       // Check if the data is not empty and loop through it
+       if (!empty($attrb->data)) {
+           $dataItems = json_decode($attrb->data); // Decode the JSON data
+           foreach ($dataItems as $dataItem) {
+               // Create a div for each data item
+               $dataDivs .= '<div class="data-item">' . htmlspecialchars($dataItem) . '</div>';
+           }
+       }
     $attrbsProps[] = [
         'name' => $attrb->name,
         'description' => $attrb->description,
-        'data' => $attrb->data,
+        'data' => $dataDivs,
         'action' => '<a href="'.route('attributes.edit', $attrb->id).'"><x-primary-button>Edit</x-primary-button></a>',
     ];
 }

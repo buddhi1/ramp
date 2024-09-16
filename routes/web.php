@@ -7,6 +7,7 @@ use App\Http\Controllers\admin\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,14 +30,18 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth', 'attachrole'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::apiResource('users', 'UserController');
+    // Route::apiResource('users', 'UserController');
     Route::resource('projects', ProjectController::class);
     Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
     Route::middleware('admin')->group(function () {
         Route::resource('attributes', AttributeController::class);
         Route::resource('users', UsersController::class);
+        Route::get('register', [RegisteredUserController::class, 'create'])
+                ->name('register');
+
+                Route::post('register', [RegisteredUserController::class, 'store']);
     });
 });
 

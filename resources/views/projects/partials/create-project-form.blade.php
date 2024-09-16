@@ -39,6 +39,14 @@
     }
 @endphp
 
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+</head>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function decrement(e) {
@@ -75,7 +83,7 @@
         <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
             {{ __('Create Project') }}
         </h2>
-        <div class="w-fill h-1 bg-gray-300 mt-2"> </div>
+        <div class="w-fill bg-gray-300 mt-2"> </div>
     </header>
 
     <form method="post" action="{{ route('projects.store') }}" class="space-y-6">
@@ -91,7 +99,7 @@
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
-            <div>
+            <div class="w-full">
                 <x-input-label for="type" :value="__('Type')" />
                 <x-select-input name="type" id="type"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" :options="$typeProps" />
@@ -164,13 +172,6 @@
             </div>
 
 
-            <!-- <div class="cursor-none">
-                <x-input-label for="scooters" :value="__('Select Scooters')" />
-                <x-custom-select-input name="scooters[]"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" id="scooters[]"
-                    :options="$scooterProps" multiple />
-                <x-input-error :messages="$errors->get('scooters[]')" class="mt-2" />
-            </div> -->
         </div>
 
         <div class="flex items-right justify-end gap-4 mt-6">
@@ -183,3 +184,9 @@
         </div>
     </form>
 </section>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('select').selectpicker();
+    });
+</script>
+</html>

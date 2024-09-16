@@ -1,14 +1,17 @@
 @php
    $userProps = [];
+   $currentuser = Auth::user();
 
 foreach ($users as $user) {
+    if($currentuser->email !== $user->email){
     $userProps[] = [
         'name' => $user->name,
         'type' => $user->email,
-        'role' => $user->roles[0]->name,
+        'role' => $user->roles[0]->name ?? 'USER',
         'status' => "ACTIVE",
         'action' => '<a href="'.route('users.edit', $user->id).'"><x-primary-button>Edit</x-primary-button></a>',
     ];
+}
 }
 @endphp
 <x-app-layout>
