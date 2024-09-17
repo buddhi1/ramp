@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>{{ config('app.name', 'Laravel') }}</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css">
+  <!-- <link rel="stylesheet" href="css/styles.css"> -->
+  <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+
+  <!-- Include Bootstrap CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Include Bootstrap Icons CSS (version 1.5.0) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+  <!-- Include Tempus Dominus Bootstrap 4 CSS -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css"
+    integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg=="
+    crossorigin="anonymous" />
+  <!-- Awesome font 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Icon to toggle the form -->
+    <div class="icon" id="toggleForm">
+      <i class="fa-solid fa-gear"></i>
+    </div>
+
+    <div class="search-form" id="searchForm" style="display: block">
+      <h4>Search</h4>
+      <button id="btnJSONDownload">Download JSON</button>
+      <button id="btnCSVDownload">Download CSV</button>
+
+
+      <form id="searchboxForm">
+        <div class="row g-2">
+          <div class="col-sm-6" style="position: relative">
+            <label for="start-time" class="col-sm-6 col-form-label">Start Time</label>
+            <input class="form-control" type="datetime-local" style="width: 100%" id="start-time"
+              name="start-time" placeholder="Start Time" />
+          </div>
+          <div class="col-sm-6" style="position: relative">
+            <label for="end-time" class="col-sm-6 col-form-label">End Time</label>
+            <input class="form-control" type="datetime-local" id="end-time" name="end-time"
+              placeholder="End Time" />
+          </div>
+        </div>
+        <div class="mb-3 row g-2">
+          <div class="col-sm-6">
+            <input class="form-check-input" style="margin-top: 11px" type="radio" name="ziporextent" id="zipRadio" />
+            <label for="zip" class="col-sm-4 col-form-label">Zip</label>
+            <div>
+              <input type="text" class="form-control" id="zip" name="zip" placeholder="Enter zip code" />
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <input class="form-check-input" style="margin-top: 11px" type="radio" name="ziporextent" id="extent" />
+            <label for="extent" class="col-sm-4 col-form-label">Extent</label>
+            <div class="row">
+              <div class="col-sm-3" id="extentbox1">
+                <input type="text" class="form-control" id="extent1" name="extent" placeholder="x" />
+              </div>
+              <div class="col-sm-3" id="extentbox2">
+                <input type="text" class="form-control" id="extent2" name="extent" placeholder="y" />
+              </div>
+              <div class="col-sm-3" id="extentbox3">
+                <input type="text" class="form-control" id="extent3" name="extent" placeholder="x" />
+              </div>
+              <div class="col-sm-3" id="extentbox4">
+                <input type="text" class="form-control" id="extent4" name="extent" placeholder="y" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <label for="pathType" class="col-sm-4 col-form-label">Path Type</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" id="pathType" name="pathType" placeholder="Enter path type" />
+          </div>
+        </div>
+        <br>
+        <!-- Distance -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="distance-check" />
+            <label for="distance">Distance:</label>
+          </div>          <div class="col-4">
+            <div id="distance-box-1" style="display: none">
+              <div class="values">
+                <span id="distance-range1">0</span><span> &dash; </span>
+                <span id="distance-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track"></div>
+                <input type="range" min="0" max="100" value="30" id="distance-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="distance-slider-2" oninput="slideTwo()">
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="distance-box">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortdistance">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div id="distance-box-2" style="display: none;">
+              <div class="input-group  mb-3">
+              <select class="form-select measures-select" id="select-distance">
+                <option>Value</option>
+                <option>Average</option>
+                <option>Max</option>
+                <option>Min</option></select>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <!-- enerygy spent -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value=""
+              id="energy-spent-check" />
+            <label for="energy-Spent">Energy Spent:</label>
+          </div>
+          <div class="col-4">
+            <div id="energy-spent-box-1" style="display: none">
+              <div class="values">
+                <span id="energy-range1">0</span>
+                <span> &dash; </span>
+                <span id="energy-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track1"></div>
+                <input type="range" min="0" max="100" value="30" id="energy-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="energy-slider-2" oninput="slideTwo()">
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="energy-spent-box">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortEnergy">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div id="energy-spent-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-select" id="select-energy">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- speed range -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="speed-check" />
+            <label for="speed">Speed Range:</label>
+          </div>
+          <div class="col-4">
+            <div id="speed-box" style="display: none">
+              <div class="values">
+                <span id="speed-range1">0</span><span> &dash; </span>
+                <span id="speed-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track2"></div>
+                <input type="range" min="0" max="100" value="30" id="speed-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="speed-slider-2" oninput="slideTwo()">
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="speed-box-1">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortSpeed">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div id="speed-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-select measures-select" id="select-speed">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- speed range ends -->
+        <!-- temparature -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="temparature-check" />
+            <label for="temparature">Temparature:</label>
+          </div>
+          <div class="col-4">
+            <div id="temparature-box" style="display: none">
+              <div class="values">
+                <span id="temp-range1">0</span><span> &dash; </span>
+                <span id="temp-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track3"></div>
+                <input type="range" min="0" max="100" value="30" id="temp-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="temp-slider-2" oninput="slideTwo()">
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="temparature-box-1">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortTemp">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div id="temparature-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-select" id="select-temparature">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- temparature end -->
+        <!-- pressure -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="pressure-check" />
+            <label for="pressure-check">Pressure:</label>
+          </div>
+          <div class="col-4">
+            <div id="pressure-box" style="display: none">
+              <div class="values">
+                <span id="pressure-range1">0</span><span> &dash; </span>
+                <span id="pressure-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track4"></div>
+                <input type="range" min="0" max="100" value="30" id="pressure-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="pressure-slider-2" oninput="slideTwo()">
+              </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="pressure-box-1">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortPressure">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>     
+          <div class="col-4">
+            <div id="pressure-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-select" id="select-pressure">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- pressure ends -->
+        <!-- humidity -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="humidity-check" />
+            <label for="humidity">Humidity:</label>
+          </div>
+          <div class="col-4">
+            <div id="humidity-box" style="display: none">
+              <div class="values">
+                <span id="humidity-range1">0</span><span> &dash; </span>
+                <span id="humidity-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track5"></div>
+                <input type="range" min="0" max="100" value="30" id="humidity-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="humidity-slider-2" oninput="slideTwo()">
+              </div>         
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="humidity-box-1">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortHumidity">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>       
+          <div class="col-4">
+            <div id="humidity-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-select" id="select-humidity">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- humidity ends -->
+        <!-- light -->
+        <div class="mb-3 row">
+          <div class="form-check" style="margin-left: 12px;">
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="light-check" />
+            <label for="light">Light:</label>
+          </div>
+          <div class="col-4">
+            <div id="light-box" style="display: none">
+              <div class="values">
+                <span id="light-range1">0</span><span> &dash; </span>
+                <span id="light-range2">100</span>
+              </div>
+              <!-- Slider -->
+              <div class="container1">
+                <div class="slider-track6"></div>
+                <input type="range" min="0" max="100" value="30" id="light-slider-1" oninput="slideOne()">
+                <input type="range" min="0" max="100" value="70" id="light-slider-2" oninput="slideTwo()">
+              </div>           
+            </div>
+          </div>
+          <div class="col-4">
+            <div style="margin-left: 15px; display: none" id="light-box-1">
+              <div class="input-group  mb-3">
+                <select class="form-select" id="sortLight">
+                  <option value="ASC">Asc</option>
+                  <option value="DSC">Desc</option>
+                  <option value="NONE">No Sort</option></select>
+                </div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div id="light-box-2" style="display: none;">
+              <div class="input-group mb-3">
+                <select class="form-control" id="select-lightx">
+                  <option>Value</option>
+                  <option>Average</option>
+                  <option>Max</option>
+                  <option>Min</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- light ends -->
+        <hr />
+        <!-- acceleration -->
+        <div class="form-group mb-3">
+          <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="acceleration-check" />
+          <label for="acceleration" class="col-form-label">Acceleration Range</label>
+            <div class="row g-4">
+              <div class="col-sm-4"> 
+                <div id="acceleration-box" style="display: none">
+                  <div class="values">                  
+                    <label for="">X axis: </label>
+                    <span id="accX-range1">0</span><span> &dash; </span>
+                    <span id="accX-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track7"></div>
+                    <input type="range" min="0" max="100" value="30" id="accX-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="accX-slider-2" oninput="slideTwo()">
+                  </div> 
+                  <div class="input-group">
+                    <select class="form-select" id="select-accelerationx">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div> 
+                </div>                                     
+              </div>
+              <div class="col-sm-4">
+                <div id="acceleration-box-1" style="display: none">
+                  <div class="values">                  
+                    <label for="">Y axis: </label>
+                    <span id="accY-range1">0</span><span> &dash; </span>
+                    <span id="accY-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track8"></div>
+                    <input type="range" min="0" max="100" value="30" id="accY-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="accY-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-accelerationy">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+         
+              </div>
+              <div class="col-sm-4">
+                <div id="acceleration-box-2" style="display: none">
+                  <div class="values">                  
+                    <label for="">Z axis: </label>
+                    <span id="accZ-range1">0</span><span> &dash; </span>
+                    <span id="accZ-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track9"></div>
+                    <input type="range" min="0" max="100" value="30" id="accZ-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="accZ-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-accelerationz">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>        
+              </div>
+          </div>
+        </div>
+        <!-- Gyroscope -->
+        <div class="form-group mb-3">
+          <input class="form-check-input" type="checkbox" style="margin-right: 3px" id="gyroscope-check" />
+          <label for="gyroscope" class="col-form-label">Gyroscope Range</label>
+            <div class="row g-4">
+              <div class="col-sm-4">
+                <div id="gyroscope-box" style="display: none">
+                  <div class="values">                  
+                    <label for="">X axis: </label>
+                    <span id="gyroX-range1">0</span><span> &dash; </span>
+                    <span id="gyroX-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track10"></div>
+                    <input type="range" min="0" max="100" value="30" id="gyroX-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="gyroX-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-gyroscopex">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+              
+              </div>
+              <div class="col-sm-4">
+                <div id="gyroscope-box-1" style="display: none">
+                  <div class="values">                  
+                    <label for="">Y axis: </label>
+                    <span id="gyroY-range1">0</span><span> &dash; </span>
+                    <span id="gyroY-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track11"></div>
+                    <input type="range" min="0" max="100" value="30" id="gyroY-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="gyroY-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-gyroscopey">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+              
+              </div>
+              <div class="col-sm-4">
+                <div id="gyroscope-box-2" style="display: none">
+                  <div class="values">                  
+                    <label for="">Z axis: </label>
+                    <span id="gyroZ-range1">0</span><span> &dash; </span>
+                    <span id="gyroZ-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track12"></div>
+                    <input type="range" min="0" max="100" value="30" id="gyroZ-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="gyroZ-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-gyroscopez">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+          
+              
+            </div>
+          </div>
+        </div>
+        <!-- Gyroscope ends -->
+        <!-- magnetometer -->
+        <div class="form-group mb-3">
+          <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="magnetometer-check" />
+          <label for="magnetometer" class="col-form-label">Magnetometer Range</label>
+            <div class="row g-4">
+              <div class="col-sm-4">
+                <div id="magnetometer-box" style="display: none">
+                  <div class="values">                  
+                    <label for="">X axis: </label>
+                    <span id="magX-range1">0</span><span> &dash; </span>
+                    <span id="magX-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track13"></div>
+                    <input type="range" min="0" max="100" value="30" id="magX-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="magX-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-magnetometerx">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+                
+              </div>
+              <div class="col-sm-4">
+                <div id="magnetometer-box-1" style="display: none">
+                  <div class="values">                  
+                    <label for="">Y axis: </label>
+                    <span id="magY-range1">0</span><span> &dash; </span>
+                    <span id="magY-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track14"></div>
+                    <input type="range" min="0" max="100" value="30" id="magY-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="magY-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-magnetometery">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>             
+              </div>
+              <div class="col-sm-4">
+                <div id="magnetometer-box-2" style="display: none">
+                  <div class="values">                  
+                    <label for="">Z axis: </label>
+                    <span id="magZ-range1">0</span><span> &dash; </span>
+                    <span id="magZ-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track15"></div>
+                    <input type="range" min="0" max="100" value="30" id="magZ-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="magZ-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-magnetometerz">
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+               
+              </div>
+          </div>
+        </div>
+        <!-- magnetometer ends -->
+        <!-- orientation -->
+        <div class="form-group mb-3">
+          <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="orientation-check" />
+          <label for="orientation" class="col-form-label">Orientation Range</label>
+            <div class="row g-4">
+              <div class="col-sm-4">
+                <div id="orientation-box" style="display: none">
+                  <div class="values">                  
+                    <label for="">X axis: </label>
+                    <span id="orienX-range1">0</span><span> &dash; </span>
+                    <span id="orienX-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track16"></div>
+                    <input type="range" min="0" max="100" value="30" id="orienX-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="orienX-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-orientationx">
+                      <option>Type</option>
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>      
+              </div>
+              <div class="col-sm-4">
+                <div id="orientation-box-1" style="display: none">
+                  <div class="values">                  
+                    <label for="">Y axis: </label>
+                    <span id="orienY-range1">0</span><span> &dash; </span>
+                    <span id="orienY-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track17"></div>
+                    <input type="range" min="0" max="100" value="30" id="orienY-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="orienY-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-orientationy">
+                      <option>Type</option>
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>    
+              </div>
+              <div class="col-sm-4">
+                <div id="orientation-box-2" style="display: none">
+                  <div class="values">                  
+                    <label for="">Z axis: </label>
+                    <span id="orienZ-range1">0</span><span> &dash; </span>
+                    <span id="orienZ-range2">100</span>
+                  </div>
+                  <!-- Slider -->
+                  <div class="container1">
+                    <div class="slider-track18"></div>
+                    <input type="range" min="0" max="100" value="30" id="orienZ-slider-1" oninput="slideOne()">
+                    <input type="range" min="0" max="100" value="70" id="orienZ-slider-2" oninput="slideTwo()">
+                  </div>
+                  <div class="input-group">
+                    <select class="form-select" id="select-orientationz">
+                      <option>Type</option>
+                      <option>Value</option>
+                      <option>Average</option>
+                      <option>Max</option>
+                      <option>Min</option>
+                    </select>
+                  </div>
+                </div>
+                          </div>
+          </div>
+        </div>
+        <!-- orientation ends -->
+        <div class="search-button">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+      
+    </div>
+  </div>
+
+  <div id="viewDiv"></div>
+  <div id="logoDiv" class="esri-widget">
+    <img class="logo-img" src="{{ asset('ScooterLabLogo.png') }}" alt="Scooter Lab">
+    <div id="basemapGalleryDiv"></div>
+  </div>
+
+
+    <!-- jquery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- moment -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.0/moment.min.js"></script>
+    <!-- tempus dominus -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"
+      integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA=="
+      crossorigin="anonymous"></script>
+    <!-- boostrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"></script>
+
+    <!-- to save trips into a json file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+
+
+    <!-- script loading -->
+    <script src="https://js.arcgis.com/4.26/"></script>
+
+    <script>
+      var url = '{{ URL::asset('/fcapi') }}';
+    </script>
+   
+    <script type="text/javascript" src="{{ asset('js/map.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/general.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/apiRequestHandler.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/searchbox.js') }}"></script>
+
+
+    <!-- <script type="text/javascript" src="js/general.js"></script>
+    <script type="text/javascript" src="js/apiRequestHandler.js"></script>
+    <script type="text/javascript" src="js/searchbox.js"></script> -->
+</body>
+
+</html>
