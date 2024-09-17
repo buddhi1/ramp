@@ -43,16 +43,24 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function roles(){
-        return $this->belongstoMany(Role::class);
-    }
-
-    public function assignRole($role){
+    public function assignRole($role)
+    {
         return $this->roles()->save($role);
     }
 
-    public function hasRole($role){
-        return $this->roles()->where('name', $role)->exists();
+    public function isAdmin()
+    {
+        // Check if the role is already set (saved during login or via middleware)
+        if (isset($this->role)) {
+            return $this->role->name === 'ADMIN';
+        }
+
+        // Optionally, use session if the role was stored there
+        return session('user_role') === 'ADMIN';
     }
 
+    public function roles()
+    {
+        return $this->belongstoMany(Role::class);
+    }
 }

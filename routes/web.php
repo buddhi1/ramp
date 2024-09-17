@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\InterfcapiController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,22 +27,23 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'attachrole'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'attachrole'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-Route::middleware('admin')->group(function () {
-    Route::apiResource('users', 'UserController');          
-    Route::resource('projects', ProjectController::class);
-    Route::resource('attributes', AttributeController::class);
-    Route::resource('users', UsersController::class);
-
-    // remove this and use the download controller
     Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
+    Route::middleware('admin')->group(function () {
+        Route::resource('attributes', AttributeController::class);
+        Route::resource('projects', ProjectController::class);
+        Route::resource('users', UsersController::class);
+
+        Route::get('register', [RegisteredUserController::class, 'create'])
+                ->name('register');
+        Route::post('register', [RegisteredUserController::class, 'store']);
+        Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
 });
 
 

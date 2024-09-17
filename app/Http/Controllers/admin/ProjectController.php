@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\admin;
 
 use App\Exports\JsontoExcelExport;
-use App\Models\Attribute;
 use App\Models\DataPolicy;
 use App\Models\Project;
 use App\Models\ProjectScooter;
-use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,7 +26,7 @@ class ProjectController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user->hasRole('ADMIN')) {
+        if ($user->isAdmin()) {
             $projects = Project::latest()->paginate(10);
         } else {
             $projects = Project::where('owner_id', $user->id)->latest()->paginate(10);
@@ -106,7 +104,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $user = Auth::user();
-        if ($user->hasRole('ADMIN')) {
+        if ($user->isAdmin()) {
 
         } else {
             $this->authorize('update', $project);
@@ -123,7 +121,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $user = Auth::user();
-        if ($user->hasRole('ADMIN')) {
+        if ($user->isAdmin()) {
 
         } else {
             $this->authorize('update', $project);
@@ -171,6 +169,8 @@ class ProjectController extends Controller
     public function download(Request $request, Project $project)
     {
         $type = $request->input('file_type');
+
+        
 
         switch ($type) {
             case 'JSON':

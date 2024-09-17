@@ -23,7 +23,22 @@
 
         <div>
             <x-input-label for="data" :value="__('Data')" />
-            <x-text-input id="data" name="data" type="text" class="mt-1 block w-full" required autofocus autocomplete="data" />
+            <div id="data-wrapper">
+                @if (isset($attribute) && is_array($attribute->data))
+                    @foreach ($attribute->data as $data)
+                        <div class="flex gap-3 mt-2">
+                            <x-text-input name="data[]" type="text" value="{{ $data }}" class="mt-1 block w-full" readonly />
+                            <x-primary-button type="button" class="remove-data-btn">{{ __('-') }}</x-primary-button>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+            
+
+            <div class="flex gap-3 mt-2">
+                <x-text-input id="new-data" type="text" class="mt-1 block w-full" placeholder="Enter new value" />
+                <x-primary-button type="button" id="add-data-btn">{{ __('+') }}</x-primary-button>
+            </div>
             <x-input-error class="mt-2" :messages="$errors->get('data')" />
         </div>
 
@@ -37,10 +52,43 @@
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('attribute Created.') }}</p>
+                >{{ __('Attribute Created.') }}</p>
             @endif
         </div>
     </form>
 </section>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dataWrapper = document.getElementById('data-wrapper');
+        const newDataInput = document.getElementById('new-data');
 
+        document.getElementById('add-data-btn').addEventListener('click', function () {
+            const newValue = newDataInput.value.trim();
+
+            if (newValue !== '') {
+                const newInputDiv = document.createElement('div');
+                newInputDiv.classList.add('flex', 'gap-3', 'mt-2');
+                newInputDiv.innerHTML = `
+                    <x-text-input name="data[]" type="text" value="${newValue}" class="mt-1 block w-full" readonly />
+                    <x-primary-button type="button" class="remove-data-btn">{{ __('-') }}</x-primary-button>
+                `;
+
+                dataWrapper.appendChild(newInputDiv);
+
+                newInputDiv.querySelector('.remove-data-btn').addEventListener('click', function () {
+                    dataWrapper.removeChild(newInputDiv);
+                });
+
+                newDataInput.value = '';
+            }
+        });
+
+        document.querySelectorAll('.remove-data-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const inputDiv = btn.parentElement;
+                dataWrapper.removeChild(inputDiv);
+            });
+        });
+    });
+</script>

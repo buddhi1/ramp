@@ -9,6 +9,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -38,6 +39,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'role' => ['required', 'string'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -47,12 +49,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
         // asign default role user when user is created
-        $user->assignRole(Role::where('name', 'User')->first());
+        $user->assignRole(Role::where('id', $request->role)->first());
 
-        event(new Registered($user));
+        // event(new Registered($user));
 
         // Auth::login($user);
 
-        return redirect(RouteServiceProvider::HOME);
+        return Redirect::route('users.index');
+        // return redirect(RouteServiceProvider::HOME);
     }
 }

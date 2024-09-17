@@ -1,6 +1,6 @@
 @php
    $user = Auth::user();
-   $isAdmin = $user->hasRole('ADMIN');
+   $isAdmin = $user->isAdmin();
    if ($isAdmin) {
       $projects_count = App\Models\Project::count();
    } else {
@@ -34,6 +34,7 @@
                <span class="ms-3">Dashboard</span>
             </a>
          </li>
+         @if($isAdmin)
          <li>
             <a href="/projects"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
@@ -48,7 +49,6 @@
                   class="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">{{$projects_count}}</span>
             </a>
          </li>
-         @if($isAdmin)
          <li>
             <a href="/attributes"
                class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">

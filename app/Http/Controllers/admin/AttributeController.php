@@ -32,7 +32,7 @@ class AttributeController extends Controller
         Attribute::create([
             'name' => $request->name,
             'description' => $request->description,
-            'data' => $request->data
+            'data' => json_encode($request->data)
         ]);
         return Redirect::route('attributes.index');
     }
@@ -48,7 +48,7 @@ class AttributeController extends Controller
         $attribute->update([
             'name' => $request->input('name'),
             'description' => $request->input('description'),
-            'data' => $request->input('data')
+            'data' => $request->json_encode(input('data'))
             // Add other fields as needed
         ]);
 

@@ -6,10 +6,12 @@ use App\Models\Attribute;
 use App\Models\DataPolicy;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
 
 class UsersController extends Controller
 {
@@ -24,72 +26,42 @@ class UsersController extends Controller
 
     public function create()
     {
-        return view('projects.create');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            // Validation rules for project creation
-            'name' => 'required',
-            'type' => 'required',
-            'irb_data' => 'required',
-            'status' => 'required'
-        ]);
-        function debug_to_console($data)
-        {
-            $output = $data;
-            if (is_array($output))
-                $output = implode(',', $output);
-
-            echo "<script>console.log('Debug Objects: " . $output . "' );</script>";
-        }
-        $ownerId = Auth::id();
-        $attrbs = json_encode($request->select_attrbs);
-        debug_to_console(json_encode($request->select_attrbs));
-        $project = Project::create([
-            'type' => $request->type,
-            'irb_data' => $request->irb_data,
-            'name' => $request->name,
-            'status' => $request->status,
-            'owner_id' => $request->select_user
-        ]);
-
-        $attrbsArray = json_decode($attrbs, true);
-
-        // Prepare an array of data for each record
-        $data = [];
-        foreach ($attrbsArray as $attrb) {
-            $data[] = [
-                'project_id' => $project->id,
-                'data_attr_id' => $attrb
-            ];
-        }
-
-        DataPolicy::insert($data);
-
-        return Redirect::route('projects.index');
+       
     }
 
     public function edit(User $user)
     {
-    
         return view('users.edit', compact('user'));
     }
 
-    public function update(Request $request, Project $project)
+    public function update(Request $request, User $user)
     {
-        $this->authorize('update', $project);
+        $user_to_update = User::find($user->id);
+        $user_to_update->name = $request->name;
+        $rules = [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+        ];
 
-        $project->update([
-            'name' => $request->input('name'),
-            'type' => $request->input('type'),
-            'status' => $request->input('status'),
-            'irb_data' => $request->input('irb_data'),
-            // Add other fields as needed
-        ]);
+        // $request->validate($rules);
 
-        return Redirect::route('projects.edit', ['project' => $project->id])->with('status', 'project-updated');
+        $user_to_update->save();
+        // $request->user()->fill($request->validated());
+
+        // if ($request->user()->isDirty('email')) {
+        //     $request->user()->email_verified_at = null;
+        // }
+
+        // $request->user()->save();
+        if($request->role){
+            $user->roles()->detach();
+            $user->assignRole(Role::where('name', $request->role)->first());
+        }
+        return Redirect::route('users.edit', ['user' => $user->id])->with('status', 'profile-updated');
     }
 
     public function destroy(Project $project)
