@@ -1,6 +1,5 @@
 // global variables
 // var url='http://localhost:8008/fcapi';
-console.log(url)
 var gminx, gminy, gmaxx, gmaxy;
 var trips;
 
