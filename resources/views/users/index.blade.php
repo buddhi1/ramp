@@ -17,7 +17,7 @@ foreach ($users as $user) {
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Current Users') }} &nbsp; <a class="float-end" href="{{route('users.create')}}"><x-primary-button>{{ __('Create New User') }}</x-primary-button></a>
+            {{ __('Current Users') }} &nbsp; <a class="float-end" href="{{route('register')}}"><x-primary-button>{{ __('Create New User') }}</x-primary-button></a>
         </h2>
     </x-slot>
     <div class="py-12">
