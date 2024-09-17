@@ -6,7 +6,7 @@
 //         console.log('Zip Code:', zip);
 //     });
 // });
-var url='http://localhost:8008/fcapi'
+// var url='http://localhost:8008/fcapi'
 document.addEventListener("DOMContentLoaded", function () {
   // Fetch initial data from the API
   fetch(url+'/initData')
