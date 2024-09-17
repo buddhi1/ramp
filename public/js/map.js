@@ -1,5 +1,10 @@
-var url='http://localhost:8008/fcapi';
+// global variables
+// var url='http://localhost:8008/fcapi';
+console.log(url)
 var gminx, gminy, gmaxx, gmaxy;
+var trips;
+
+console.log();
 
 window.onload = function() {
     fetchTripsAndRender();
@@ -24,16 +29,108 @@ async function fetchTripsAndRender() {
 
     var response=await fetch(url+'/trips')
     // .then((response) => renderScooterTrips(response.json()))
-    // //.then((data) => console.log(data))
+    // .then((data) => console.log(data))
     // .catch((error) => console.error("Error fetching data:", error));
 
-    const trips = await response.json();
+    trips = await response.json();
     console.log(trips)
     // Call renderScooterTrips with fetched data
     renderScooterTrips(trips);
 
     
 }
+
+// write to a JSON file
+function downloadJSONFile(jsonArray) {
+    const jsonString = JSON.stringify(jsonArray, null, 2); // Properly format JSON with indentation
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    saveAs(blob, 'output.json'); // Use FileSaver.js to save the file
+}
+
+document.getElementById('btnJSONDownload').addEventListener('click', () => {
+    console.log(trips[0])
+    // const jsonString = JSON.stringify(trips);
+    downloadJSONFile(trips);
+});
+
+// save to a csv file 
+function downloadCSVFile(jsonArray) {
+    if (!jsonArray || !jsonArray.length) {
+        console.error("Invalid data");
+        return;
+    }
+
+    // Function to generate sensor data rows and group them
+    function generateSensorDataRows(sensorData, numRows) {
+        let rows = [];
+        for (let i = 0; i < numRows; i++) {
+            let row = {};
+            for (let sensor in sensorData) {
+                if (Array.isArray(sensorData[sensor])) {
+                    row[sensor] = sensorData[sensor][i] !== undefined ? sensorData[sensor][i] : 'null';
+                } else {
+                    row[sensor] = 'null';
+                }
+            }
+            rows.push(row);
+        }
+        return rows;
+    }
+
+    // Main loop to process JSON array
+    const csvRows = [];
+    const headers = [];
+
+    jsonArray.forEach(item => {
+        const { sensor_data, ...otherData } = item;
+
+        // Get the number of rows based on sensor data arrays
+        const numRows = Math.max(...Object.values(sensor_data).map(arr => arr.length));
+
+        // Generate sensor data rows
+        const sensorRows = generateSensorDataRows(sensor_data, numRows);
+
+        // Add headers if they haven't been added yet
+        if (csvRows.length === 0) {
+            const nonSensorHeaders = Object.keys(otherData);
+            const sensorHeaders = Object.keys(sensor_data);
+            headers.push(...nonSensorHeaders, ...sensorHeaders);
+            csvRows.push(headers.join(','));  // Add headers as the first row in the CSV
+        }
+
+        // Add the sensor rows combined with the non-sensor data
+        sensorRows.forEach(sensorRow => {
+            const nonSensorRow = Object.keys(otherData).map(key => 
+                otherData[key] === null || otherData[key] === undefined ? 'null' : otherData[key]
+            );
+            const fullRow = [...nonSensorRow, ...Object.values(sensorRow)];
+            csvRows.push(fullRow.join(','));
+        });
+    });
+
+    // Create a CSV string
+    const csvString = csvRows.join('\n');
+
+    // Create a Blob object from the CSV string
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    // Create a download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'data.csv';  // Name of the file
+
+    // Append link, trigger download and then remove the link
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+   
+}
+
+document.getElementById('btnCSVDownload').addEventListener('click', () => {
+    downloadCSVFile(trips);
+});
+
+
 //take the fetched trip data and visualize it on the map.
 function renderScooterTrips(trips) {
     require([
@@ -49,9 +146,12 @@ function renderScooterTrips(trips) {
     
         "esri/widgets/BasemapToggle",
         "esri/widgets/BasemapGallery",
-        "esri/widgets/Expand"
+        "esri/widgets/Expand",
+
+        "esri/widgets/Sketch",
+        "esri/geometry/geometryEngine"
     
-        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand) {
+        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand, Sketch, geometryEngine) {
             esriConfig.apiKey="AAPK7c7d215fcd9848cb80732ee818643c4dup3DhD1dsH1W--DI1Mh8vEFyp0faPvPhi2POkUdUUpPBjP8HcEzkxwKimIOeFngf";
     
         const map = new Map({
@@ -61,12 +161,21 @@ function renderScooterTrips(trips) {
         const graphicsLayer = new GraphicsLayer();
         map.add(graphicsLayer);
     
-        trips.forEach((trip, i) => {
-            let deltaX = i*10;
-            let deltaY = i*10;
-            let b = 140 + i * 20; // Change the color slightly for each trip
+        // Separate graphics layer for the rectangle
+        const rectangleLayer = new GraphicsLayer();
+        map.add(rectangleLayer);
     
-            graphicsLayer.add(getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b));
+        // Add polylines for each trip to the polylineLayer
+        trips.forEach((trip, i) => {
+            let b = 140 + i * 20; // Change the color slightly for each trip
+            // error 1: trip empty, 5: no data undefined values at last, 6: long line, 8: some values at last are undefined, 10:  some values at last are undefined
+            // if (i==0) {
+                // console.log(trip.sensor_data.longitude[0])
+                // console.log(typeof trip.sensor_data.longitude[0])
+            if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
+                graphicsLayer.add(getScooterTripAllCont(Graphic, trip, b, first=true));
+            }
+            // }
         });
 
         const view = new MapView({
@@ -125,20 +234,54 @@ function renderScooterTrips(trips) {
         });
     
         view.ui.add(bgExpand, "top-left");
+
+        // Initialize Sketch widget for drawing the rectangle
+        const sketch = new Sketch({
+            view: view,
+            layer: rectangleLayer, // Use the rectangleLayer for sketching
+            creationMode: "update",
+            visibleElements: {
+                createTools: { point: false, polyline: false, polygon: false, circle: false, rectangle: true }
+            }
+        });
+        view.ui.add(sketch, "top-left");
+
+        // Listen for the create event to capture the rectangle's extent
+        sketch.on("create", function(event) {
+            if (event.state === "complete") {
+                const geometry = event.graphic.geometry;
+
+                // Calculate and log the extent
+                const extent = geometry.extent;
+                // console.log('Extent:', extent);
+                updateExtentInputs(extent);
+            }
+        });
+
+        // Function to update extent input fields
+        function updateExtentInputs(extent) {
+            document.getElementById('extent1').value = extent.xmin.toFixed(4);
+            document.getElementById('extent2').value = extent.ymin.toFixed(4);
+            document.getElementById('extent3').value = extent.xmax.toFixed(4);
+            document.getElementById('extent4').value = extent.ymax.toFixed(4);
+        }
     });
 }
 
 // Utility functions
 //Converts GPS data points into a format suitable for polyline creation in ArcGIS.
-function getGpsPath(gpsData, deltaX = 0, deltaY = 0) {
+function getGpsPath(gpsData, first) {
     const gpsPath = [];
     // console.log("test data")
     // console.log(gpsData.latitude, gpsData.longitude)
+    valCount=gpsData.longitude.length;
+    if(valCount>gpsData.latitude.length)
+        valCount=gpsData.latitude.length;
 
-    var minx=(gpsData.longitude[0] + deltaX)/-100, miny=(gpsData.latitude[0] + deltaY)/100;
-    var maxx=(gpsData.longitude[0] + deltaX)/-100, maxy=(gpsData.latitude[0] + deltaY)/100;
-    for (let i = 0; i < gpsData.longitude.length; i++) {
-        gpsPath.push([(gpsData.longitude[i] + deltaX)/-100, (gpsData.latitude[i] + deltaY)/100]);
+    var minx=(gpsData.longitude[0]), miny=(gpsData.latitude[0]);
+    var maxx=(gpsData.longitude[0]), maxy=(gpsData.latitude[0]);
+    for (let i = 0; i < valCount; i++) {
+        gpsPath.push([gpsData.longitude[i], gpsData.latitude[i]]);
 
         //remove in the production. This data will be provided from the API
         if(minx>gpsPath[i][0])
@@ -152,7 +295,7 @@ function getGpsPath(gpsData, deltaX = 0, deltaY = 0) {
     }
 
     // if first entry
-    if(deltaX==0){
+    if(first){
         gminx=minx;
         gminy=miny;
         gmaxx=maxx;
@@ -167,6 +310,7 @@ function getGpsPath(gpsData, deltaX = 0, deltaY = 0) {
         if(gmaxy<maxy)
             gmaxy=maxy;
     }
+    first=false
     // console.log(gpsPath)
     return gpsPath;
 }
@@ -181,7 +325,7 @@ function getAccSamplingIntervals(sensorData, n, label) {
         const intervalTime = timestamps[0] + i * chk;
         intervals.push(intervalTime + label);
     }
-    console.log(intervals);
+    // console.log(intervals);
     return intervals;
 }
 
@@ -208,9 +352,9 @@ function getScooterTripInfo(trip) {
         Min_speed: trip.min_speed + " kmph",
         Start_battery_status: trip.start_battery_status + " %",
         End_battery_status: trip.end_battery_status + " %",
+        Stops: trip.stops,
         Video: trip.video_link,
-        Audio: trip.audio_link,
-        Stops: trip.stops
+        Audio: trip.audio_link
     };
 
     tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.acc_x, "ax"));
@@ -242,14 +386,14 @@ function getSamplingRate(size, label) {
     return arr;
 }
 
-function getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b) {
+function getScooterTripAllCont(Graphic, trip, b, first) {
     const attributes = getScooterTripInfo(trip);
-    console.log(trip)
+    // console.log(trip)
     //a polyline graphic is created and added to the map.
     const polylineGraphic = new Graphic({
         geometry: {
             type: "polyline",
-            paths: getGpsPath(trip.sensor_data, deltaX, deltaY)
+            paths: getGpsPath(trip.sensor_data, first)
         },
         symbol: {
             type: "simple-line",
@@ -272,9 +416,9 @@ function getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b) {
                         { fieldName: "Min_speed", label: "Min Speed" },
                         { fieldName: "Start_battery_status", label: "Start Battery" },
                         { fieldName: "End_battery_status", label: "End Battery" },
-                        { fieldName: "Stops", label: "Stops" },
-                        { fieldName: "Video", label: "Video Link", format: { hyperlink: true } },
-                        { fieldName: "Audio", label: "Audio Link", format: { hyperlink: true } }
+                        { fieldName: "Stops", label: "Stops" }
+                        // { fieldName: "Video", label: "Video Link", format: { hyperlink: true } },
+                        // { fieldName: "Audio", label: "Audio Link", format: { hyperlink: true } }
                     ]
                 },
                 // plots single axis sensor data
@@ -388,7 +532,22 @@ function getScooterTripAllCont(Graphic, trip, deltaX, deltaY, b) {
                             }
                         }
                     ],
-                }
+                },
+                {
+                    type: "text",
+                    text: `
+                        <b>Video:</b><br>
+                        <video width="300" controls>
+                            <source src="{Video}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video><br>
+                        <b>Audio:</b><br>
+                        <audio controls>
+                            <source src="{Audio}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    `
+                },
             ]
         }
     });

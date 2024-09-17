@@ -7,6 +7,7 @@ use App\Http\Controllers\admin\ProjectController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\InterfcapiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use App\Http\Controllers\DownloadController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth/login');
 });
 
 Route::get('/dashboard', function () {
@@ -33,31 +34,52 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::apiResource('users', 'UserController');
-Route::resource('projects', ProjectController::class);
-Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
-
 Route::middleware('admin')->group(function () {
+    Route::apiResource('users', 'UserController');          
+    Route::resource('projects', ProjectController::class);
     Route::resource('attributes', AttributeController::class);
     Route::resource('users', UsersController::class);
+
+    // remove this and use the download controller
+    Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
 });
 
-//temp map tool vies
-Route::get('/mapTool', function () {
-    return view('mapTool/index');
+
+
+//map tool view
+Route::middleware('auth')->group(function () {
+    Route::get('/mapTool', function () {
+        return view('mapTool/index');
+    });
+
+    // trip data downloading using a seperate module
+    Route::post('/downloadTrips', [DownloadController::class, 'trips'])->name('download.trips');
 });
 
-// temp solution to handle FC api calls
-Route::get('fcapi/initData', function () {
-    $response = Http::get('192.168.214.103:5000/initData');
-    return $response;
+// intermediery FC API
+Route::middleware('auth')->group(function () {
+    Route::get('fcapi/{method}', function ($method) {
+        $controller = app(InterfcapiController::class);
+
+        if (method_exists($controller, $method)) {
+            return app()->call([$controller, $method]);
+        }
+
+        abort(404); // Method not found
+    });
 });
 
-// temp solution to handle FC api calls
-Route::get('fcapi/trips', function () {
-    $response = Http::get('192.168.214.103:5000/trips');
-    return $response;
-});
+
+// Route::get('fcapi/initData', function () {
+//     $response = Http::get('192.168.214.103:5000/initData');
+//     return $response;
+// });
+
+// // temp solution to handle FC api calls
+// Route::get('fcapi/trips', function () {
+//     $response = Http::get('192.168.214.103:5000/trips');
+//     return $response;
+// });
 
 
 require __DIR__ . '/auth.php';
