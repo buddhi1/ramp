@@ -30,13 +30,26 @@ class InterfcapiController extends Controller
         abort(404);
     }
 
-    // method to retrieve trips data
+    // method to retrieve trips with all sensor data
     public function trips(){
         $user = Auth::user();
         if($user){
             // use the following to check if the user has a certain role. Ex. admin
             // $isAdmin = $user->hasRole('ADMIN');
             $response = Http::get($this->url.'/trips');
+            return $response;
+        }
+        // not found. Has not access to the trips
+        abort(404);
+    }
+
+    // method to retrieve trips with only with GPS data
+    public function tripsGPS(){
+        $user = Auth::user();
+        if($user){
+            // use the following to check if the user has a certain role. Ex. admin
+            // $isAdmin = $user->hasRole('ADMIN');
+            $response = Http::get($this->url.'/tripsGPS');
             return $response;
         }
         // not found. Has not access to the trips

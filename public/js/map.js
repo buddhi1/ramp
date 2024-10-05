@@ -26,7 +26,8 @@ async function fetchTripsAndRender() {
     //     console.error('Could not fetch trips:', error);
     // }
 
-    var response=await fetch(url+'/trips')
+    // var response=await fetch(url+'/trips') // used to retriev all trip data
+    var response=await fetch(url+'/tripsGPS') // sed to retrieve only gps data
     // .then((response) => renderScooterTrips(response.json()))
     // .then((data) => console.log(data))
     // .catch((error) => console.error("Error fetching data:", error));
