@@ -20,13 +20,13 @@ class AttachRoleToUser
             $user = Auth::user();
 
             // Check if the role is not already attached
-            if (!isset($user->role)) {
-                // Get the user's role (assuming roles relationship exists)
-                $user->role = $user->roles[0]; // Attach the first role to the user object
+            // if (!isset($user->role)) {
+            //     // Get the user's role (assuming roles relationship exists)
+            //     $user->role = $user->roles[0]; // Attach the first role to the user object
 
                 // Optionally store the role in the session for later use
-                session(['user_role' => $user->role->name]);
-            }
+                session(['user_role' => $user->roles[0]->name]);
+            // }
         }
 
         // Proceed with the request
