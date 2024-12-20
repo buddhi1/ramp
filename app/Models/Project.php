@@ -12,4 +12,9 @@ class Project extends Model
     protected $fillable = [
         'name', 'type', 'status', 'irb_data', 'start_time', 'end_time', 'owner_id', 'fleet_number',
     ];
+
+    public function schedule()
+    {
+        return $this->hasOne(ProjectSchedule::class);
+    }
 }

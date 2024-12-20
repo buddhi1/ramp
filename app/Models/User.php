@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google2fa_secret'
     ];
 
     /**
@@ -63,4 +65,11 @@ class User extends Authenticatable
     {
         return $this->belongstoMany(Role::class);
     }
+
+    // protected function google2faSecret(): Attribute {
+    //     return new Attribute(
+    //         get: fn ($value): mixed => decrypt(value: $value),
+    //         set: fn ($value): string => encrypt(value: $value)
+    //     );
+    // }
 }

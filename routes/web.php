@@ -25,12 +25,20 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
+
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified', 'attachrole'])->name('dashboard');
+})->middleware(['auth', 'verified', 'attachrole', '2fa'])->name('dashboard');
 
 Route::middleware(['auth', 'attachrole'])->group(function () {
+    Route::get('/profile/verify2fa', [ProfileController::class, 'show2FAVerifyForm'])->name('profile.show2FAVerifyForm');
+    Route::post('/profile/verify2fa', [ProfileController::class, 'verify2fa'])->name('profile.verify2FA');
+});
+
+Route::middleware(['auth', 'attachrole', '2fa'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/enable2fa', [ProfileController::class, 'enable2fa'])->name('profile.enable2FA');
+    Route::post('/profile/disable2fa/{user}', [ProfileController::class, 'disable2fa'])->name('profile.disable2FA');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
@@ -40,7 +48,7 @@ Route::middleware(['auth', 'attachrole'])->group(function () {
         Route::resource('users', UsersController::class);
 
         Route::get('register', [RegisteredUserController::class, 'create'])
-                ->name('register');
+            ->name('register');
         Route::post('register', [RegisteredUserController::class, 'store']);
         Route::delete('/profile/{user}', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });

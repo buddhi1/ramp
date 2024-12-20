@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->password)
         ]);
         // asign default role user when user is created
         $user->assignRole(Role::where('id', $request->role)->first());
