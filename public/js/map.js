@@ -167,13 +167,12 @@ function renderScooterTrips(trips) {
     
         // Add polylines for each trip to the polylineLayer
         trips.forEach((trip, i) => {
-            let b = 140 + i * 20; // Change the color slightly for each trip
             // error 1: trip empty, 5: no data undefined values at last, 6: long line, 8: some values at last are undefined, 10:  some values at last are undefined
             // if (i==0) {
                 // console.log(trip.sensor_data.longitude[0])
                 // console.log(typeof trip.sensor_data.longitude[0])
             if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
-                graphicsLayer.add(getScooterTripAllCont(Graphic, trip, b, first=true));
+                graphicsLayer.add(getScooterTripAllCont(Graphic, trip, trips.length, i, first=true));
             }
             // }
         });
@@ -346,7 +345,7 @@ function getScooterTripInfo(trip) {
         Date: new Date(trip.start_time).toLocaleDateString(),
         Start_time: new Date(trip.start_time).toLocaleTimeString(),
         End_time: new Date(trip.end_time).toLocaleTimeString(),
-        Trip_distance: trip.trip_distance + " m",
+        Trip_distance: trip.distance + " mi",
         Average_speed: trip.avg_speed + " kmph",
         Max_speed: trip.max_speed + " kmph",
         Min_speed: trip.min_speed + " kmph",
@@ -386,9 +385,37 @@ function getSamplingRate(size, label) {
     return arr;
 }
 
-function getScooterTripAllCont(Graphic, trip, b, first) {
+// generate color for heat map
+function getHeatMapColor(value) {
+    // Normalize the value between 0 and 1
+    let t = Math.min(Math.max(value, 0), 1);
+
+    // Define colors
+    let colors = [
+        [128, 0, 0],
+        [255, 0, 128],
+        [255, 0, 255]   
+    ];
+
+    // Determine the two colors to interpolate between
+    let i = Math.floor(t * (colors.length - 1));
+    let startColor = colors[i];
+    let endColor = colors[i + 1] || colors[i];
+
+    // Interpolate between the two selected colors
+    let f = t * (colors.length - 1) - i;
+    let color = [
+        Math.round((1 - f) * startColor[0] + f * endColor[0]),
+        Math.round((1 - f) * startColor[1] + f * endColor[1]),
+        Math.round((1 - f) * startColor[2] + f * endColor[2])
+    ];
+
+    return color;
+}
+
+function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
     const attributes = getScooterTripInfo(trip);
-    // console.log(trip)
+    let genColor = getHeatMapColor((tid)/(tripCount-1));  // Normalize by line index
     //a polyline graphic is created and added to the map.
     const polylineGraphic = new Graphic({
         geometry: {
@@ -397,7 +424,9 @@ function getScooterTripAllCont(Graphic, trip, b, first) {
         },
         symbol: {
             type: "simple-line",
-            color: [200, 119, b], // Orange
+            join: "round",
+            // color: [200, 119, b], // Orange
+            color: genColor, 
             width: 5
         },
         attributes: attributes,
