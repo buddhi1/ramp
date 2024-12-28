@@ -33,7 +33,7 @@ async function fetchTripsAndRender() {
 // ----------------------------------------------------------------------------------
 //fetches trip data and renders them on the map.
 // ----------------------------------------------------------------------------------
-function renderScooterTrips(trips) {
+function renderScooterTrips(trips) {    
     require([
         "esri/config",
         "esri/Map",
@@ -175,9 +175,10 @@ function renderScooterTrips(trips) {
         view.watch("updating", function (isUpdating) {
             if (!isUpdating) {
                 hideLoading();
-            } else {
-                // showLoading();
-            }
+            } 
+            // else {
+            //     showLoading();
+            // }
         });
 
         // // Show loading animation when layers are loading

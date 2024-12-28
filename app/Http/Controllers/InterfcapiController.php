@@ -51,20 +51,18 @@ class InterfcapiController extends Controller
             // use the following to check if the user has a certain role. Ex. admin
             // $isAdmin = $user->hasRole('ADMIN');
 
-            // Get all the query parameters from the GET request
-            $requestData = request()->query();
-            // Initialize an empty string to hold the concatenated result
-            $concatenatedString = '';
-            // Loop through each element in the query data
-            foreach ($requestData as $key => $value) {
-                // Concatenate key and value into the string
-                $concatenatedString .= $key . '=' . $value . ' ';
-            }
+            // // Get all the query parameters from the GET request
+            // $requestData = request()->query();
+            // // Initialize an empty string to hold the concatenated result
+            // $concatenatedString = '';
+            // // Loop through each element in the query data
+            // foreach ($requestData as $key => $value) {
+            //     // Concatenate key and value into the string
+            //     $concatenatedString .= $key . '=' . $value . ' ';
+            // }
             // dd($concatenatedString);
             // add scooter model, scooter ID, and trip lists if available from the table (this is only related to controlled experiments) 
-
-
-            $response = Http::get($this->url.'/tripsGPS?'.$request);
+            $response = Http::get($this->url.'/tripsGPS?'.$request->getQueryString());
             return $response;
         }
         // not found. Has not access to the trips

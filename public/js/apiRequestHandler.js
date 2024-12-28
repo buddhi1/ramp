@@ -27,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("searchboxForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
+    // enable loading animation
+    const loadingDiv = document.getElementById("loading");
+    loadingDiv.style.display = "block";
+    
     let extentData = gatherExtentData();
     let startTime = document.getElementById("start-time").value;
     let endTime = document.getElementById("end-time").value;
@@ -37,13 +41,26 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
     let values = gatherValues();
     let sortOrders = gatherSortOrders();
 
-    console.log(extentData);
-    console.log(startTime);
-    console.log(endTime);
-    console.log(attributeIds);
-    console.log(measures);
-    console.log(values);
-    console.log(sortOrders);
+    
+
+    if(startTime=='' || endTime==''){
+      loadingDiv.style.display = "none";
+      alert('Currently this functinality is limited to filter by dates.\nPlease select a date range to proceed.')
+    }
+    if(startTime!=''){
+      startTime+=':00'
+    }
+    if(endTime!=''){
+      endTime+=':00'
+    }
+
+    // console.log(extentData);
+    // console.log(startTime);
+    // console.log(endTime);
+    // console.log(attributeIds);
+    // console.log(measures);
+    // console.log(values);
+    // console.log(sortOrders);
 
     // API request URL
     let apiUrl =
@@ -60,13 +77,21 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
         end_time: endTime,
       });
 
-    console.log(apiUrl);
 
     // Send request
     fetch(apiUrl)
-      .then((response) => response.json())
-      //.then((data) => console.log(data))
-      .catch((error) => console.error("Error fetching data:", error));
+      .then((response) => {
+          if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json(); // Parse JSON response
+      })
+      .then((data) => {
+        renderScooterTrips(data); // Call the abc method with the JSON data
+      })
+      .catch((error) => {
+          console.error("Error fetching data:", error);
+      });
   });
 
 // ----------------------------------------------------------------------------------
