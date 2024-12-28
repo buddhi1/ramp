@@ -715,7 +715,8 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
                 textDiv.innerHTML = textContent;
 
                 const hr1 = document.createElement('hr');
-                hr1.style.margin = '18px 0';  // Add some spacing around the line
+                hr1.style.margin = '18px auto 0px auto';  // Add some spacing around the line
+                hr1.style.width = '375px';
 
                 // Wrap the two charts in a container for layout
                 const containerDiv = document.createElement('div');

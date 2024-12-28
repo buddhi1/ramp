@@ -47,6 +47,8 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
       loadingDiv.style.display = "none";
       alert('Currently this functinality is limited to filter by dates.\nPlease select a date range to proceed.')
     }
+
+    // following concats aree needed since API looks for seconds as well
     if(startTime!=''){
       startTime+=':00'
     }
@@ -87,7 +89,11 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
           return response.json(); // Parse JSON response
       })
       .then((data) => {
-        renderScooterTrips(data); // Call the abc method with the JSON data
+        if(data.length<=0){
+          loadingDiv.style.display = "none";
+          alert('No trips found');
+        }
+        renderScooterTrips(data); // Call the method to render the trips on the map
       })
       .catch((error) => {
           console.error("Error fetching data:", error);
