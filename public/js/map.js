@@ -1,137 +1,38 @@
+// ----------------------------------------------------------------------------------
+// map renders the map tool including a recent or chosen set of scooter trips. 
+// This file contains methods to render the trip routes and dynamically load sensor data for selected trips.
+// Authors: Buddhi Ashan M. K., Christina Duthie
+// Start date: 02/01/2023
+
+
+//This version only renders trips. The other sensor data are pulled dynamically as per user request 
+// ----------------------------------------------------------------------------------
+
 // global variables
-// var url='http://localhost:8008/fcapi';
 var gminx, gminy, gmaxx, gmaxy;
 var trips;
 
-console.log();
 
 window.onload = function() {
     fetchTripsAndRender();
 };
 
+// ----------------------------------------------------------------------------------
+// Requests trip GPS data and renders them on the Map
+// ----------------------------------------------------------------------------------
 async function fetchTripsAndRender() {
-    // try {
-    //     // Path to the JSON file which contains the trip data
-    //     const response = await fetch('/data/trips.json'); 
-    //     if (!response.ok) {
-    //         throw new Error(`HTTP error! status: ${response.status}`);
-    //     }
-    //     const trips = await response.json();
-    //     console.log(trips)
-    //     // Call renderScooterTrips with fetched data
-    //     renderScooterTrips(trips); 
-    // } 
-    // //Error handling is implemented to log issues if the fetch request fails.
-    // catch (error) {
-    //     console.error('Could not fetch trips:', error);
-    // }
-
     // var response=await fetch(url+'/trips') // used to retriev all trip data
-    var response=await fetch(url+'/tripsGPS') // sed to retrieve only gps data
-    // .then((response) => renderScooterTrips(response.json()))
-    // .then((data) => console.log(data))
-    // .catch((error) => console.error("Error fetching data:", error));
+    var response=await fetch(url+'/tripsGPS') // used to retrieve only gps data
+    .catch((error) => console.error("Error fetching data:", error));
 
     trips = await response.json();
-    console.log(trips)
     // Call renderScooterTrips with fetched data
     renderScooterTrips(trips);
-
-    
 }
 
-// write to a JSON file
-function downloadJSONFile(jsonArray) {
-    const jsonString = JSON.stringify(jsonArray, null, 2); // Properly format JSON with indentation
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    saveAs(blob, 'output.json'); // Use FileSaver.js to save the file
-}
-
-document.getElementById('btnJSONDownload').addEventListener('click', () => {
-    console.log(trips[0])
-    // const jsonString = JSON.stringify(trips);
-    downloadJSONFile(trips);
-});
-
-// save to a csv file 
-function downloadCSVFile(jsonArray) {
-    if (!jsonArray || !jsonArray.length) {
-        console.error("Invalid data");
-        return;
-    }
-
-    // Function to generate sensor data rows and group them
-    function generateSensorDataRows(sensorData, numRows) {
-        let rows = [];
-        for (let i = 0; i < numRows; i++) {
-            let row = {};
-            for (let sensor in sensorData) {
-                if (Array.isArray(sensorData[sensor])) {
-                    row[sensor] = sensorData[sensor][i] !== undefined ? sensorData[sensor][i] : 'null';
-                } else {
-                    row[sensor] = 'null';
-                }
-            }
-            rows.push(row);
-        }
-        return rows;
-    }
-
-    // Main loop to process JSON array
-    const csvRows = [];
-    const headers = [];
-
-    jsonArray.forEach(item => {
-        const { sensor_data, ...otherData } = item;
-
-        // Get the number of rows based on sensor data arrays
-        const numRows = Math.max(...Object.values(sensor_data).map(arr => arr.length));
-
-        // Generate sensor data rows
-        const sensorRows = generateSensorDataRows(sensor_data, numRows);
-
-        // Add headers if they haven't been added yet
-        if (csvRows.length === 0) {
-            const nonSensorHeaders = Object.keys(otherData);
-            const sensorHeaders = Object.keys(sensor_data);
-            headers.push(...nonSensorHeaders, ...sensorHeaders);
-            csvRows.push(headers.join(','));  // Add headers as the first row in the CSV
-        }
-
-        // Add the sensor rows combined with the non-sensor data
-        sensorRows.forEach(sensorRow => {
-            const nonSensorRow = Object.keys(otherData).map(key => 
-                otherData[key] === null || otherData[key] === undefined ? 'null' : otherData[key]
-            );
-            const fullRow = [...nonSensorRow, ...Object.values(sensorRow)];
-            csvRows.push(fullRow.join(','));
-        });
-    });
-
-    // Create a CSV string
-    const csvString = csvRows.join('\n');
-
-    // Create a Blob object from the CSV string
-    const blob = new Blob([csvString], { type: 'text/csv' });
-
-    // Create a download link
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'data.csv';  // Name of the file
-
-    // Append link, trigger download and then remove the link
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-   
-}
-
-document.getElementById('btnCSVDownload').addEventListener('click', () => {
-    downloadCSVFile(trips);
-});
-
-
-//take the fetched trip data and visualize it on the map.
+// ----------------------------------------------------------------------------------
+//fetches trip data and renders them on the map.
+// ----------------------------------------------------------------------------------
 function renderScooterTrips(trips) {
     require([
         "esri/config",
@@ -154,6 +55,18 @@ function renderScooterTrips(trips) {
         ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand, Sketch, geometryEngine) {
             esriConfig.apiKey="AAPK7c7d215fcd9848cb80732ee818643c4dup3DhD1dsH1W--DI1Mh8vEFyp0faPvPhi2POkUdUUpPBjP8HcEzkxwKimIOeFngf";
     
+        const loadingDiv = document.getElementById("loading");
+
+        // Function to show loading indicator
+        function showLoading() {
+            loadingDiv.style.display = "block";
+        }
+    
+        // Function to hide loading indicator
+        function hideLoading() {
+            loadingDiv.style.display = "none";
+        }
+        
         const map = new Map({
             basemap: "streets-navigation-vector"
         });
@@ -167,20 +80,13 @@ function renderScooterTrips(trips) {
     
         // Add polylines for each trip to the polylineLayer
         trips.forEach((trip, i) => {
-            // error 1: trip empty, 5: no data undefined values at last, 6: long line, 8: some values at last are undefined, 10:  some values at last are undefined
-            // if (i==0) {
-                // console.log(trip.sensor_data.longitude[0])
-                // console.log(typeof trip.sensor_data.longitude[0])
             if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
                 graphicsLayer.add(getScooterTripAllCont(Graphic, trip, trips.length, i, first=true));
             }
-            // }
         });
 
         const view = new MapView({
             map: map,
-            // center: [-98.61947, 29.58553], //Longitude, latitude
-            // zoom: 15,
             container: "viewDiv"
         });
         // console.log(gminx, gminy, gmaxx, gmaxy)
@@ -264,6 +170,29 @@ function renderScooterTrips(trips) {
             document.getElementById('extent3').value = extent.xmax.toFixed(4);
             document.getElementById('extent4').value = extent.ymax.toFixed(4);
         }
+
+        // Show loading animation when the view is updating
+        view.watch("updating", function (isUpdating) {
+            if (!isUpdating) {
+                hideLoading();
+            } else {
+                // showLoading();
+            }
+        });
+
+        // // Show loading animation when layers are loading
+        // view.on("layerview-create", function (event) {
+        //     const layerView = event.layerView;
+        //     if (layerView) {
+        //         layerView.watch("updating", function (isUpdating) {
+        //             if (isUpdating) {
+        //                 showLoading();
+        //             } else {
+        //                 hideLoading();
+        //             }
+        //         });
+        //     }
+        // });
     });
 }
 
@@ -371,6 +300,7 @@ function getScooterTripInfo(trip) {
     tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.temperature, "temp"));
     tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.pressure, "pres"));
     tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.humidity, "humi"));
+    tripInfo=Object.assign({}, tripInfo, getSampleDataDict(trip.sensor_data.altitude, "alti"));
 
 
     return tripInfo;
@@ -413,8 +343,329 @@ function getHeatMapColor(value) {
     return color;
 }
 
+// Reneders line charts and returns the html object. Works for multi-axis data
+// function renderLineChart(data, lineNames, title, y_label, x_label) {
+//     // Create the chart container div
+//     const chartDiv = document.createElement('div');
+//     chartDiv.classList.add('chart-container');
+
+//     const margin = { top: 20, right: 30, bottom: 70, left: 40 };
+//     const width = 400 - margin.left - margin.right;
+//     const height = 220 - margin.top - margin.bottom;
+
+//     const svg = d3.select(chartDiv).append('svg')
+//         .attr('width', width + margin.left + margin.right)
+//         .attr('height', height + margin.top + margin.bottom)
+//         .append('g')
+//         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+//     const x = d3.scaleLinear()
+//         .domain([0, data[0].length - 1])
+//         .range([0, width]);
+
+//     const y = d3.scaleLinear()
+//         .domain([d3.min(data.flat()), d3.max(data.flat())])  // Flatten 2D array to get the min/max values
+//         .range([height, 0]);
+
+//     const line = d3.line()
+//         .x((d, i) => x(i))
+//         .y(d => y(d));
+
+//     // Generate a unique color for each line
+//     const colors = d3.schemeCategory10;
+
+//     // Draw lines for each data array in the 2D array
+//     const paths = data.map((lineData, index) => {
+//         return svg.append('path')
+//             .data([lineData])
+//             .attr('class', 'line')
+//             .attr('d', line)  // Initial path generation
+//             .attr('fill', 'none')
+//             .attr('stroke', colors[index % colors.length])  // Use color from d3.schemeCategory10
+//             .attr('stroke-width', 2);
+//     });
+
+//     const xAxis = svg.append('g')
+//         .attr('transform', 'translate(0,' + height + ')')
+//         .call(d3.axisBottom(x).ticks(5));
+
+//     const yAxis = svg.append('g')
+//         .call(d3.axisLeft(y));
+
+//     svg.append('text')
+//         .attr('transform', 'translate(' + (width / 2) + ',' + (height + margin.bottom - 10) + ')')
+//         .style('text-anchor', 'middle')
+//         .text(x_label);
+
+//     svg.append('text')
+//         .attr('transform', 'rotate(-90)')
+//         .attr('x', -height / 2)
+//         .attr('y', -30)
+//         .style('text-anchor', 'middle')
+//         .text(y_label);
+
+//     svg.append('text')
+//         .attr('x', width / 2)
+//         .attr('y', 0)
+//         .attr('text-anchor', 'middle')
+//         .style('font-size', '18px')
+//         .text(title);
+
+//     // Create a brush for zooming functionality
+//     const brush = d3.brushX()
+//         .extent([[0, 0], [width, height]]) // Set the extent of the brush
+//         .on('end', brushed);  // Change from 'brush' to 'end' event for smoother operation
+
+//     svg.append('g')
+//         .attr('class', 'brush')
+//         .call(brush);
+
+//     // Brush event handler (triggered when selection ends)
+//     function brushed(event) {
+//         const selection = event.selection;
+
+//         if (!selection) return;
+
+//         // Get the new domain based on the brush selection
+//         const [x0, x1] = selection;
+//         const newDomain = [x.invert(x0), x.invert(x1)];
+
+//         // Update the x-axis domain to snap to integers
+//         const newXDomain = [Math.floor(newDomain[0]), Math.ceil(newDomain[1])];
+
+//         // Ensure that the domain is not smaller than the data range
+//         x.domain([Math.max(0, newXDomain[0]), Math.min(data[0].length - 1, newXDomain[1])]);
+
+//         // Update each line path with the new domain
+//         paths.forEach((path, index) => {
+//             path.transition() // Add a smooth transition
+//             .duration(500) // Set the duration of the transition in milliseconds
+//             .attr('d', line(data[index]));  // Update path data for each line
+//         });
+
+//         // Dynamically calculate ticks based on the current zoom level
+//         const tickSpacing = Math.max(1, Math.floor(x.domain()[1] - x.domain()[0]) / 5);
+//         const numTicks = Math.max(3, Math.floor((x.domain()[1] - x.domain()[0]) / tickSpacing));
+
+//         // Update the x-axis with the new scale and dynamically calculated ticks
+//         xAxis.transition() // Add a smooth transition to the axis
+//         .duration(500)
+//         .call(d3.axisBottom(x).ticks(numTicks).tickFormat(d3.format('~s')));
+//     }
+
+//     // Double click reset to restore the full view
+//     svg.on('dblclick', function() {
+//         // Reset x-axis domain to show the full data range
+//         x.domain([0, data[0].length - 1]);
+
+//         // Reset the brush
+//         d3.select('.brush').call(brush.move, null);
+
+//         // Update the chart
+//         paths.forEach((path, index) => {
+//             path.transition() // Add a smooth transition
+//             .duration(500) // Set the duration of the transition in milliseconds
+//             .attr('d', line(data[index]));  // Reset path data for each line
+//         });
+
+//         xAxis.transition() // Add a smooth transition to the axis
+//         .duration(500)
+//         .call(d3.axisBottom(x).ticks(5));  // Show default 5 ticks for full view
+//     });
+
+//     // Create the legend
+//     const legend = svg.append('g')
+//         .attr('transform', 'translate(0,' + (height + 20) + ')');
+
+//     data.forEach((lineData, index) => {
+//         legend.append('rect')
+//             .attr('x', index * 100)
+//             .attr('width', 20)
+//             .attr('height', 10)
+//             .attr('fill', colors[index % colors.length]);
+
+//         legend.append('text')
+//             .attr('x', index * 100 + 25)
+//             .attr('y', 10)
+//             .text(lineNames[index])
+//             .style('font-size', '12px')
+//             .attr('alignment-baseline', 'middle');
+//     });
+
+//     return chartDiv;
+// }
+
+function renderLineChart(data, lineNames, title, y_label, x_label) {
+    // Create the chart container div
+    const chartDiv = document.createElement('div');
+    chartDiv.classList.add('chart-container');
+
+    const margin = { top: 20, right: 30, bottom: 70, left: 40 };
+    const width = 400 - margin.left - margin.right;
+    const height = 220 - margin.top - margin.bottom;
+
+    const svg = d3.select(chartDiv).append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    const x = d3.scaleLinear()
+        .domain([0, data[0].length - 1])
+        .range([0, width]);
+
+    const y = d3.scaleLinear()
+        .domain([d3.min(data.flat()), d3.max(data.flat())])  // Flatten 2D array to get the min/max values
+        .range([height, 0]);
+
+    const line = d3.line()
+        .x((d, i) => x(i))
+        .y(d => y(d));
+
+    // Generate a unique color for each line
+    const colors = d3.schemeCategory10;
+
+    // Create the clip path to restrict the lines to the chart area
+    const clip = svg.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("x", 0)
+        .attr("y", 0); // Ensures lines are clipped at x=0
+
+    // Group for the lines with clipPath applied
+    const linesGroup = svg.append('g')
+        .attr('class', 'lines-group')
+        .attr('clip-path', 'url(#clip)'); // Apply clipPath to the lines group
+
+    // Draw lines for each data array in the 2D array
+    const paths = data.map((lineData, index) => {
+        return linesGroup.append('path')
+            .data([lineData])
+            .attr('class', 'line')
+            .attr('d', line)  // Initial path generation
+            .attr('fill', 'none')
+            .attr('stroke', colors[index % colors.length])  // Use color from d3.schemeCategory10
+            .attr('stroke-width', 2);
+    });
+
+    const xAxis = svg.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(d3.axisBottom(x).ticks(5));
+
+    const yAxis = svg.append('g')
+        .call(d3.axisLeft(y));
+
+    svg.append('text')
+        .attr('transform', 'translate(' + (width / 2) + ',' + (height + margin.bottom - 10) + ')')
+        .style('text-anchor', 'middle')
+        .text(x_label);
+
+    svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -height / 2)
+        .attr('y', -30)
+        .style('text-anchor', 'middle')
+        .text(y_label);
+
+    svg.append('text')
+        .attr('x', width / 2)
+        .attr('y', 0)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '18px')
+        .text(title);
+
+    // Create a brush for zooming functionality
+    const brush = d3.brushX()
+        .extent([[0, 0], [width, height]]) // Set the extent of the brush
+        .on('end', brushed);  // Change from 'brush' to 'end' event for smoother operation
+
+    svg.append('g')
+        .attr('class', 'brush')
+        .call(brush);
+
+    // Brush event handler (triggered when selection ends)
+    function brushed(event) {
+        const selection = event.selection;
+
+        if (!selection) return;
+
+        // Get the new domain based on the brush selection
+        const [x0, x1] = selection;
+        const newDomain = [x.invert(x0), x.invert(x1)];
+
+        // Update the x-axis domain to snap to integers
+        const newXDomain = [Math.floor(newDomain[0]), Math.ceil(newDomain[1])];
+
+        // Ensure that the domain is not smaller than the data range
+        x.domain([Math.max(0, newXDomain[0]), Math.min(data[0].length - 1, newXDomain[1])]);
+
+        // Smooth transition for axis and lines
+        xAxis.transition().duration(1000).call(d3.axisBottom(x));
+        
+        // Smooth transition for line paths
+        paths.forEach((path, index) => {
+            path.transition()
+                .duration(1000)
+                .attr('d', line(data[index]));  // Update path data for each line
+        });
+
+        // Dynamically calculate ticks based on the current zoom level
+        const tickSpacing = Math.max(1, Math.floor(x.domain()[1] - x.domain()[0]) / 5);
+        const numTicks = Math.max(3, Math.floor((x.domain()[1] - x.domain()[0]) / tickSpacing));
+
+        // Update the x-axis with the new scale and dynamically calculated ticks
+        xAxis.call(d3.axisBottom(x).ticks(numTicks).tickFormat(d3.format('~s')));
+    }
+
+    // Double click reset to restore the full view
+    svg.on('dblclick', function() {
+        // Reset x-axis domain to show the full data range
+        x.domain([0, data[0].length - 1]);
+
+        // Reset the brush
+        d3.select('.brush').call(brush.move, null);
+
+        // Smooth transition to reset the chart
+        paths.forEach((path, index) => {
+            path.transition()
+                .duration(1000)
+                .attr('d', line(data[index]));  // Reset path data for each line
+        });
+
+        xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));  // Show default 5 ticks for full view
+    });
+
+    // Create the legend
+    const legend = svg.append('g')
+        .attr('transform', 'translate(0,' + (height + 20) + ')');
+
+    data.forEach((lineData, index) => {
+        legend.append('rect')
+            .attr('x', index * 100)
+            .attr('width', 20)
+            .attr('height', 10)
+            .attr('fill', colors[index % colors.length]);
+
+        legend.append('text')
+            .attr('x', index * 100 + 25)
+            .attr('y', 10)
+            .text(lineNames[index])
+            .style('font-size', '12px')
+            .attr('alignment-baseline', 'middle');
+    });
+
+    return chartDiv;
+}
+
+
+
+
+// ------------------------------------------------------------------------------
+// Dynamically loads sensor data for a selected trip.
+// ------------------------------------------------------------------------------
 function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
-    const attributes = getScooterTripInfo(trip);
     let genColor = getHeatMapColor((tid)/(tripCount-1));  // Normalize by line index
     //a polyline graphic is created and added to the map.
     const polylineGraphic = new Graphic({
@@ -429,157 +680,185 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
             color: genColor, 
             width: 5
         },
-        attributes: attributes,
         popupTemplate: {
-            title: "{Name}",
-            content: [
-                {
-                    type: "fields",
-                    fieldInfos: [
-                        { fieldName: "Date", label: "Date" },
-                        { fieldName: "Start_time", label: "Start Time" },
-                        { fieldName: "End_time", label: "End Time" },
-                        { fieldName: "Trip_distance", label: "Trip Distance" },
-                        { fieldName: "Average_speed", label: "Average Speed" },
-                        { fieldName: "Max_speed", label: "Max Speed" },
-                        { fieldName: "Min_speed", label: "Min Speed" },
-                        { fieldName: "Start_battery_status", label: "Start Battery" },
-                        { fieldName: "End_battery_status", label: "End Battery" },
-                        { fieldName: "Stops", label: "Stops" }
-                        // { fieldName: "Video", label: "Video Link", format: { hyperlink: true } },
-                        // { fieldName: "Audio", label: "Audio Link", format: { hyperlink: true } }
-                    ]
-                },
-                // plots single axis sensor data
-                {
-                    type: "media",
-                    title: "Sensor Data",
-                    mediaInfos: [
-                        {
-                            title: "<b>Temperature</b>",
-                            type: "line-chart",
-                            value: {
-                                fields: getSamplingRate(trip.sensor_data.acc_x.length, "temp")
-                            }
-                        },
-                        {
-                            title: "<b>Pressure</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "pres"),
-                            }
-                        },
-                        {
-                            title: "<b>Humidity</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "humi"),
-                            }
-                        }
-                    ],
-                },
-                // plots for multi axis data
-                {
-                    type: "media",
-                    title: "Accelerometer Data",
-                    mediaInfos: [
-                        {
-                            title: "<b>Accelerometer X</b>",
-                            type: "line-chart",
-                            value: {
-                                fields: getSamplingRate(trip.sensor_data.acc_x.length, "ax")
-                            }
-                        },
-                        {
-                            title: "<b>Accelerometer Y</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "ay"),
-                            }
-                        },
-                        {
-                            title: "<b>Accelerometer Z</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "az"),
-                            }
-                        }
-                    ],
-                },
-                {
-                    type: "media",
-                    title: "Gyroscope Data",
-                    mediaInfos: [
-                        // charts for multi axis data
-                        {
-                            title: "<b>Gyroscope X</b>",
-                            type: "line-chart",
-                            value: {
-                                fields: getSamplingRate(trip.sensor_data.acc_x.length, "gx")
-                            }
-                        },
-                        {
-                            title: "<b>Gyroscope Y</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "gy"),
-                            }
-                        },
-                        {
-                            title: "<b>Gyroscope Z</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "gz"),
-                            }
-                        }
-                    ],
-                },
-                {
-                    type: "media",
-                    title: "Magnetometer Data",
-                    mediaInfos: [
-                        // charts for multi axis data
-                        {
-                            title: "<b>Magnetometer X</b>",
-                            type: "line-chart",
-                            value: {
-                                fields: getSamplingRate(trip.sensor_data.acc_x.length, "mx")
-                            }
-                        },
-                        {
-                            title: "<b>Magnetometer Y</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "my"),
-                            }
-                        },
-                        {
-                            title: "<b>Magnetometer Z</b>",
-                            type: "line-chart",
-                            value: {
-                              fields: getSamplingRate(trip.sensor_data.acc_x.length, "mz"),
-                            }
-                        }
-                    ],
-                },
-                {
-                    type: "text",
-                    text: `
-                        <b>Video:</b><br>
-                        <video width="300" controls>
-                            <source src="{Video}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video><br>
-                        <b>Audio:</b><br>
-                        <audio controls>
-                            <source src="{Audio}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    `
-                },
-            ]
+        // title: "Polyline Chart",
+        content: () => {
+        // Dynamically fetch data for the chart
+        tripID = trip.trip_id;
+        return fetch(url+'/tripData?id='+tripID)
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data[0])
+
+                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'], 'Accelerometer', 'Acc', 'Time (ms)');
+                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'], 'Gyroscope', 'Gyro', 'Time (ms)');
+                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'], 'Magnetometer', 'Mag', 'Time (ms)');
+                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'], 'Orientation', 'Val', 'Time (ms)');
+                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'], 'Altitude', 'Val', 'Time (ms)');
+                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Humidity', 'Val', 'Time (ms)');
+                const chartPress = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Pressure', 'Val', 'Time (ms)');
+                const chartTemp = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Temperature', 'Val', 'Time (ms)');
+
+                const textContent = `<h5>Trip ${tripID} (Scooter ${data[0].scooter_id})</h5>
+                    <p><strong>Start Date:</strong> ${data[0].start_time}</p>
+                    <p><strong>End Date:</strong> ${data[0].end_time}</p>
+                    <p><strong>Distance:</strong> ${data[0].distance}</p>
+                    <p><strong>Average Speed:</strong> ${data[0].avg_speed}</p>
+                    <p><strong>Max Speed:</strong> ${data[0].max_speed}</p>
+                    <p><strong>Min Speed:</strong> ${data[0].min_speed}</p>
+                    <p><strong>Start Battery:</strong> ${data[0].start_battery}</p>
+                    <p><strong>End Battery:</strong> ${data[0].end_battery}</p>
+                    `;
+                // Append the text content (above charts)
+                const textDiv = document.createElement('div');
+                textDiv.innerHTML = textContent;
+
+                const hr1 = document.createElement('hr');
+                hr1.style.margin = '18px 0';  // Add some spacing around the line
+
+                // Wrap the two charts in a container for layout
+                const containerDiv = document.createElement('div');
+                containerDiv.style.display = 'block';  // Display charts side by side
+
+                // Append both charts to the container
+                containerDiv.appendChild(textDiv);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartAcc);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartGyro);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartMag);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartOri);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartAlt);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartHumi);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartPress);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                containerDiv.appendChild(chartTemp);
+                containerDiv.appendChild(hr1.cloneNode(true));
+                
+                return containerDiv;
+            })
+            .catch(err => {
+                console.error("Error fetching chart data:", err);
+                return "Failed to load chart data.";
+            });
         }
+    },
     });
 
     return polylineGraphic;
 }
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// This front-end data downloading is deprecated functinality
+
+// ----------------------------------------------------------------------------------
+// write to a JSON file
+// deprecated method
+// ----------------------------------------------------------------------------------
+function downloadJSONFile(jsonArray) {
+    const jsonString = JSON.stringify(jsonArray, null, 2); // Properly format JSON with indentation
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    saveAs(blob, 'output.json'); // Use FileSaver.js to save the file
+}
+
+document.getElementById('btnJSONDownload').addEventListener('click', () => {
+    console.log(trips[0])
+    // const jsonString = JSON.stringify(trips);
+    downloadJSONFile(trips);
+});
+
+// ----------------------------------------------------------------------------------
+// save to a csv file 
+// deprecated method
+// ----------------------------------------------------------------------------------
+function downloadCSVFile(jsonArray) {
+    if (!jsonArray || !jsonArray.length) {
+        console.error("Invalid data");
+        return;
+    }
+
+    // Function to generate sensor data rows and group them
+    function generateSensorDataRows(sensorData, numRows) {
+        let rows = [];
+        for (let i = 0; i < numRows; i++) {
+            let row = {};
+            for (let sensor in sensorData) {
+                if (Array.isArray(sensorData[sensor])) {
+                    row[sensor] = sensorData[sensor][i] !== undefined ? sensorData[sensor][i] : 'null';
+                } else {
+                    row[sensor] = 'null';
+                }
+            }
+            rows.push(row);
+        }
+        return rows;
+    }
+
+    // Main loop to process JSON array
+    const csvRows = [];
+    const headers = [];
+
+    jsonArray.forEach(item => {
+        const { sensor_data, ...otherData } = item;
+
+        // Get the number of rows based on sensor data arrays
+        const numRows = Math.max(...Object.values(sensor_data).map(arr => arr.length));
+
+        // Generate sensor data rows
+        const sensorRows = generateSensorDataRows(sensor_data, numRows);
+
+        // Add headers if they haven't been added yet
+        if (csvRows.length === 0) {
+            const nonSensorHeaders = Object.keys(otherData);
+            const sensorHeaders = Object.keys(sensor_data);
+            headers.push(...nonSensorHeaders, ...sensorHeaders);
+            csvRows.push(headers.join(','));  // Add headers as the first row in the CSV
+        }
+
+        // Add the sensor rows combined with the non-sensor data
+        sensorRows.forEach(sensorRow => {
+            const nonSensorRow = Object.keys(otherData).map(key => 
+                otherData[key] === null || otherData[key] === undefined ? 'null' : otherData[key]
+            );
+            const fullRow = [...nonSensorRow, ...Object.values(sensorRow)];
+            csvRows.push(fullRow.join(','));
+        });
+    });
+
+    // Create a CSV string
+    const csvString = csvRows.join('\n');
+
+    // Create a Blob object from the CSV string
+    const blob = new Blob([csvString], { type: 'text/csv' });
+
+    // Create a download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'data.csv';  // Name of the file
+
+    // Append link, trigger download and then remove the link
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+   
+}
+
+// ----------------------------------------------------------------------------------
+// deprecated method
+// ----------------------------------------------------------------------------------
+document.getElementById('btnCSVDownload').addEventListener('click', () => {
+    downloadCSVFile(trips);
+});
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -56,7 +56,7 @@ let lightBoxTwo = document.getElementById("light-box-2");
 let lightCheck = document.getElementById("light-check");
 
 speedChecked.onchange = function(){
-    console.log(speedChecked.checked)
+    // console.log(speedChecked.checked)
     if(speedChecked.checked){
         speedBox.style.display = "block";
         speedBoxOne.style.display = "block";
@@ -72,7 +72,7 @@ speedChecked.onchange = function(){
 }
 
 accelationCheck.onchange = function(){
-    console.log(accelationCheck.checked)
+    // console.log(accelationCheck.checked)
     if(accelationCheck.checked){
         accelationBox.style.display = "block";
         accelationBoxOne.style.display = "block";
@@ -89,7 +89,7 @@ accelationCheck.onchange = function(){
 }
 
 gyroscopeCheck.onchange = function(){
-    console.log(gyroscopeCheck.checked)
+    // console.log(gyroscopeCheck.checked)
     if(gyroscopeCheck.checked){
         gyroscopeBox.style.display = "block";
         gyroscopeBoxOne.style.display = "block";
@@ -105,7 +105,7 @@ gyroscopeCheck.onchange = function(){
 }
 
 magnetometerCheck.onchange = function(){
-    console.log(magnetometerCheck.checked)
+    // console.log(magnetometerCheck.checked)
     if(magnetometerCheck.checked){
         magnetometerBox.style.display = "block";
         magnetometerBoxOne.style.display = "block";
@@ -121,7 +121,7 @@ magnetometerCheck.onchange = function(){
 }
 
 orientationCheck.onchange = function(){
-    console.log(orientationCheck.checked)
+    // console.log(orientationCheck.checked)
     if(orientationCheck.checked){
         orientationBox.style.display = "block";
         orientationBoxOne.style.display = "block";
@@ -139,7 +139,7 @@ orientationCheck.onchange = function(){
 
 
 enerygyCheck.onchange = function(){
-    console.log(enerygyCheck.checked)
+    // console.log(enerygyCheck.checked)
     if(enerygyCheck.checked){
         enerygyBox.style.display = "block";
         enerygyBoxOne.style.display = "block";
@@ -155,7 +155,7 @@ enerygyCheck.onchange = function(){
 }
 
 distanceCheck.onchange = function(){
-    console.log(distanceCheck.checked)
+    // console.log(distanceCheck.checked)
     if(distanceCheck.checked){
         distanceBox.style.display = "block";
         distanceBoxOne.style.display = "block";
@@ -173,7 +173,7 @@ distanceCheck.onchange = function(){
 }
 
 temparatureCheck.onchange = function(){
-    console.log(temparatureCheck.checked)
+    // console.log(temparatureCheck.checked)
     if(temparatureCheck.checked){
         temparatureBox.style.display = "block";
         temparatureBoxOne.style.display = "block";
@@ -191,7 +191,7 @@ temparatureCheck.onchange = function(){
 }
 
 pressureCheck.onchange = function(){
-    console.log(pressureCheck.checked)
+    // console.log(pressureCheck.checked)
     if(pressureCheck.checked){
         pressureBox.style.display = "block";
         pressureBoxOne.style.display = "block";
@@ -209,7 +209,7 @@ pressureCheck.onchange = function(){
 }
 
 humidityCheck.onchange = function(){
-    console.log(humidityCheck.checked)
+    // console.log(humidityCheck.checked)
     if(humidityCheck.checked){
         humidityBox.style.display = "block";
         humidityBoxOne.style.display = "block";
@@ -226,7 +226,7 @@ humidityCheck.onchange = function(){
 }
 
 lightCheck.onchange = function(){
-    console.log(lightCheck.checked)
+    // console.log(lightCheck.checked)
     if(lightCheck.checked){
         lightBox.style.display = "block";
         lightBoxOne.style.display = "block";

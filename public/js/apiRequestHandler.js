@@ -1,24 +1,29 @@
-// document.addEventListener('DOMContentLoaded', function() {
-//     document.getElementById('searchboxForm').addEventListener('submit', function(event) {
-//         event.preventDefault();  // This prevents the default form submission
-//         console.log("Form Submitted");
-//         const zip = document.getElementById('zip').value;
-//         console.log('Zip Code:', zip);
-//     });
-// });
-// var url='http://localhost:8008/fcapi'
+// ----------------------------------------------------------------------------------
+// apiRequestHandler handles all FC requests through RAMP intermedieryAPI. 
+// This file contains methods to populate the search box and the map tool UI.
+// This also consists of methods to filter/query data
+// Authors: Christina Duthie, Buddhi Ashan M. K.
+// Start date: 02/01/2023
+// ----------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------
+// Requests initial data to populate the search box from intermedieryAPI
+// returns the JSON initial data bump
+// This data are used to populate the search box sliders and text boxes
+// ----------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", function () {
   // Fetch initial data from the API
   fetch(url+'/initData')
     .then((response) => response.json())
-    // .then((data) => {
-    //   console.log("Initial Data:", data);
-    // })
     .catch((error) => console.error("Error fetching initial data:", error));
 
 });
 
-// Get trips filtered by sensor data
+// ----------------------------------------------------------------------------------
+// Search box submit button functinality
+// Requests trips filtered by sensor data
+// Reads the sliders and text boxes. Populates the request and send to intermedieryAPI
+// ----------------------------------------------------------------------------------
 document.getElementById("searchboxForm").addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -32,17 +37,17 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
     let values = gatherValues();
     let sortOrders = gatherSortOrders();
 
-    // console.log(extentData);
-    // console.log(startTime);
-    // console.log(endTime);
-    // console.log(attributeIds);
-    // console.log(measures);
-    // console.log(values);
-    // console.log(sortOrders);
+    console.log(extentData);
+    console.log(startTime);
+    console.log(endTime);
+    console.log(attributeIds);
+    console.log(measures);
+    console.log(values);
+    console.log(sortOrders);
 
     // API request URL
     let apiUrl =
-      `${yourApiUrl}/trips?` +
+      url+`/tripsGPS?` +
       new URLSearchParams({
         extent: JSON.stringify(extentData),
         scooter_model: scooterModel,
@@ -55,6 +60,8 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
         end_time: endTime,
       });
 
+    console.log(apiUrl);
+
     // Send request
     fetch(apiUrl)
       .then((response) => response.json())
@@ -62,19 +69,25 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
       .catch((error) => console.error("Error fetching data:", error));
   });
 
+// ----------------------------------------------------------------------------------
+// read the MBR of the selected extent in Map tool
+// ----------------------------------------------------------------------------------
 function gatherExtentData() {
   let extent = [];
-  if (document.getElementById("extent").checked) {
+  if (document.getElementById("zipRadio").checked) {
+    extent.push(document.getElementById("zip").value);
+  } else {
     extent.push(document.getElementById("extent1").value);
     extent.push(document.getElementById("extent2").value);
     extent.push(document.getElementById("extent3").value);
     extent.push(document.getElementById("extent4").value);
-  } else {
-    extent.push(document.getElementById("zip").value);
   }
   return extent;
 }
 
+// ----------------------------------------------------------------------------------
+// Reads individual sensor data related fileds in the search box
+// ----------------------------------------------------------------------------------
 function gatherAttributeIds() {
   // Collect attribute IDs based on UI Search filters
   let attributes = [];
@@ -95,6 +108,9 @@ function gatherAttributeIds() {
   }
   if (document.getElementById("humidity-check").checked) {
     attributes.push("humidity");
+  }
+  if (document.getElementById("light-check").checked) {
+    attributes.push("light");
   }
   if (document.getElementById("acceleration-check").checked) {
     attributes.push("acc_x");
@@ -128,6 +144,7 @@ function gatherMeasures() {
   let temparatureMeasure = document.getElementById("select-temparature");
   let pressureMeasure = document.getElementById("select-pressure");
   let humidityMeasure = document.getElementById("select-humidity");
+  let lightMeasure = document.getElementById("select-light");
   let accelerationXMeasure = document.getElementById("select-accelerationx");
   let accelerationYMeasure = document.getElementById("select-accelerationy");
   let accelerationZMeasure = document.getElementById("select-accelerationz");
@@ -158,6 +175,9 @@ function gatherMeasures() {
   }
   if (document.getElementById("humidity-check").checked) {
     measures.push(humidityMeasure.value);
+  }
+  if (document.getElementById("light-check").checked) {
+    measures.push(lightMeasure.value);
   }
   if (document.getElementById("acceleration-check").checked) {
     measures.push(accelerationXMeasure.value);
@@ -197,6 +217,8 @@ function gatherValues() {
   let pressureslider2 = document.getElementById("pressure-slider-2");
   let humidityslider1 = document.getElementById("humidity-slider-1");
   let humidityslider2 = document.getElementById("humidity-slider-2");
+  let lightslider1 = document.getElementById("light-slider-1");
+  let lightslider2 = document.getElementById("light-slider-2");
   let accxslider1 = document.getElementById("accX-slider-1");
   let accxslider2 = document.getElementById("accX-slider-2");
   let accyslider1 = document.getElementById("accY-slider-1");
@@ -239,6 +261,9 @@ function gatherValues() {
   }
   if (document.getElementById("humidity-check").checked) {
     values.push([humidityslider1.value, humidityslider2.value]);
+  }
+  if (document.getElementById("light-check").checked) {
+    values.push([lightslider1.value, lightslider2.value]);
   }
   if (document.getElementById("acceleration-check").checked) {
     values.push([accxslider1.value, accxslider2.value]);
@@ -291,6 +316,10 @@ function gatherSortOrders() {
   let humiditySort = document.getElementById("sortHumidity");
   if (document.getElementById("humidity-check").checked) {
     sortOrders.push(humiditySort.value);
+  }
+  let lightSort = document.getElementById("sortLight");
+  if (document.getElementById("light-check").checked) {
+    sortOrders.push(lightSort.value);
   }
 
   return sortOrders;

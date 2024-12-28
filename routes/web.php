@@ -71,8 +71,13 @@ Route::middleware('auth')->group(function () {
     Route::get('fcapi/{method}', function ($method) {
         $controller = app(InterfcapiController::class);
 
+        // Get all the query parameters from the GET request
+        $requestData = request()->query();
+        // dd($requestData);
+
         if (method_exists($controller, $method)) {
-            return app()->call([$controller, $method]);
+            // Check if the method exists, then call it with the request data
+            return app()->call([$controller, $method], $requestData);
         }
 
         abort(404); // Method not found
@@ -85,11 +90,13 @@ Route::middleware('auth')->group(function () {
 //     return $response;
 // });
 
-// // temp solution to handle FC api calls
-// Route::get('fcapi/trips', function () {
-//     $response = Http::get('192.168.214.103:5000/trips');
-//     return $response;
-// });
+// temp solution to handle FC api calls. This is used by the front-end developer for his local dev workflow
+// http://172.20.215.102:8008/fcapi-open/tripsGPS
+Route::get('fcapi-open/tripsGPS', function () {
+    // $response = Http::get('192.168.214.103:5000/trips');
+    $response = Http::get('192.168.214.103:5000/tripsGPS');
+    return $response;
+});
 
 
 require __DIR__ . '/auth.php';

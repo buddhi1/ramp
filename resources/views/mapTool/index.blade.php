@@ -34,8 +34,8 @@
             </div>
           </div>
           <div class="col-sm-6">
-            <input class="form-check-input" style="margin-top: 11px" type="radio" name="ziporextent" id="extent" />
-            <label for="extent" class="col-sm-4 col-form-label">Extent</label>
+            <!-- <input class="form-check-input" style="margin-top: 11px" type="radio" name="ziporextent" id="extent" /> -->
+            <label class="col-sm-4 col-form-label">Extent</label>
             <div class="row">
               <div class="col-sm-3" id="extentbox1">
                 <input type="text" class="form-control" id="extent1" name="extent" placeholder="x" />
@@ -52,19 +52,20 @@
             </div>
           </div>
         </div>
-        <div class="mb-3 row">
+        <!-- <div class="mb-3 row">
           <label for="pathType" class="col-sm-4 col-form-label">Path Type</label>
           <div class="col-sm-8">
             <input type="text" class="form-control" id="pathType" name="pathType" placeholder="Enter path type" />
           </div>
-        </div>
+        </div> -->
         <br>
         <!-- Distance -->
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="distance-check" />
-            <label for="distance">Distance:</label>
-          </div>          <div class="col-4">
+            <label>Distance:</label>
+          </div>
+          <div class="col-4">
             <div id="distance-box-1" style="display: none">
               <div class="values">
                 <span id="distance-range1">0</span><span> &dash; </span>
@@ -82,9 +83,10 @@
             <div style="margin-left: 15px; display: none" id="distance-box">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortdistance">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>
@@ -105,7 +107,7 @@
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value=""
               id="energy-spent-check" />
-            <label for="energy-Spent">Energy Spent:</label>
+            <label>Energy Spent:</label>
           </div>
           <div class="col-4">
             <div id="energy-spent-box-1" style="display: none">
@@ -126,9 +128,10 @@
             <div style="margin-left: 15px; display: none" id="energy-spent-box">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortEnergy">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>
@@ -149,7 +152,7 @@
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="speed-check" />
-            <label for="speed">Speed Range:</label>
+            <label>Speed Range:</label>
           </div>
           <div class="col-4">
             <div id="speed-box" style="display: none">
@@ -169,9 +172,10 @@
             <div style="margin-left: 15px; display: none" id="speed-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortSpeed">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>
@@ -193,7 +197,7 @@
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="temparature-check" />
-            <label for="temparature">Temparature:</label>
+            <label>Temparature:</label>
           </div>
           <div class="col-4">
             <div id="temparature-box" style="display: none">
@@ -213,9 +217,10 @@
             <div style="margin-left: 15px; display: none" id="temparature-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortTemp">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>
@@ -237,7 +242,7 @@
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="pressure-check" />
-            <label for="pressure-check">Pressure:</label>
+            <label>Pressure:</label>
           </div>
           <div class="col-4">
             <div id="pressure-box" style="display: none">
@@ -257,9 +262,10 @@
             <div style="margin-left: 15px; display: none" id="pressure-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortPressure">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>     
@@ -281,7 +287,7 @@
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="humidity-check" />
-            <label for="humidity">Humidity:</label>
+            <label>Humidity:</label>
           </div>
           <div class="col-4">
             <div id="humidity-box" style="display: none">
@@ -301,9 +307,10 @@
             <div style="margin-left: 15px; display: none" id="humidity-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortHumidity">
-                  <option value="ASC">Asc</option>
+                <option value="NONE">No Sort</option>
+                <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>       
@@ -325,7 +332,7 @@
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
             <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="light-check" />
-            <label for="light">Light:</label>
+            <label>Light:</label>
           </div>
           <div class="col-4">
             <div id="light-box" style="display: none">
@@ -345,16 +352,17 @@
             <div style="margin-left: 15px; display: none" id="light-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortLight">
+                  <option value="NONE">No Sort</option>
                   <option value="ASC">Asc</option>
                   <option value="DSC">Desc</option>
-                  <option value="NONE">No Sort</option></select>
+                </select>
                 </div>
             </div>
           </div>
           <div class="col-4">
             <div id="light-box-2" style="display: none;">
               <div class="input-group mb-3">
-                <select class="form-control" id="select-lightx">
+                <select class="form-control" id="select-light">
                   <option>Value</option>
                   <option>Average</option>
                   <option>Max</option>
@@ -369,12 +377,12 @@
         <!-- acceleration -->
         <div class="form-group mb-3">
           <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="acceleration-check" />
-          <label for="acceleration" class="col-form-label">Acceleration Range</label>
+          <label class="col-form-label">Acceleration Range</label>
             <div class="row g-4">
               <div class="col-sm-4"> 
                 <div id="acceleration-box" style="display: none">
                   <div class="values">                  
-                    <label for="">X axis: </label>
+                    <label>X axis: </label>
                     <span id="accX-range1">0</span><span> &dash; </span>
                     <span id="accX-range2">100</span>
                   </div>
@@ -397,7 +405,7 @@
               <div class="col-sm-4">
                 <div id="acceleration-box-1" style="display: none">
                   <div class="values">                  
-                    <label for="">Y axis: </label>
+                    <label>Y axis: </label>
                     <span id="accY-range1">0</span><span> &dash; </span>
                     <span id="accY-range2">100</span>
                   </div>
@@ -421,7 +429,7 @@
               <div class="col-sm-4">
                 <div id="acceleration-box-2" style="display: none">
                   <div class="values">                  
-                    <label for="">Z axis: </label>
+                    <label>Z axis: </label>
                     <span id="accZ-range1">0</span><span> &dash; </span>
                     <span id="accZ-range2">100</span>
                   </div>
@@ -446,12 +454,12 @@
         <!-- Gyroscope -->
         <div class="form-group mb-3">
           <input class="form-check-input" type="checkbox" style="margin-right: 3px" id="gyroscope-check" />
-          <label for="gyroscope" class="col-form-label">Gyroscope Range</label>
+          <label class="col-form-label">Gyroscope Range</label>
             <div class="row g-4">
               <div class="col-sm-4">
                 <div id="gyroscope-box" style="display: none">
                   <div class="values">                  
-                    <label for="">X axis: </label>
+                    <label>X axis: </label>
                     <span id="gyroX-range1">0</span><span> &dash; </span>
                     <span id="gyroX-range2">100</span>
                   </div>
@@ -475,7 +483,7 @@
               <div class="col-sm-4">
                 <div id="gyroscope-box-1" style="display: none">
                   <div class="values">                  
-                    <label for="">Y axis: </label>
+                    <label>Y axis: </label>
                     <span id="gyroY-range1">0</span><span> &dash; </span>
                     <span id="gyroY-range2">100</span>
                   </div>
@@ -499,7 +507,7 @@
               <div class="col-sm-4">
                 <div id="gyroscope-box-2" style="display: none">
                   <div class="values">                  
-                    <label for="">Z axis: </label>
+                    <label>Z axis: </label>
                     <span id="gyroZ-range1">0</span><span> &dash; </span>
                     <span id="gyroZ-range2">100</span>
                   </div>
@@ -527,12 +535,12 @@
         <!-- magnetometer -->
         <div class="form-group mb-3">
           <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="magnetometer-check" />
-          <label for="magnetometer" class="col-form-label">Magnetometer Range</label>
+          <label class="col-form-label">Magnetometer Range</label>
             <div class="row g-4">
               <div class="col-sm-4">
                 <div id="magnetometer-box" style="display: none">
                   <div class="values">                  
-                    <label for="">X axis: </label>
+                    <label>X axis: </label>
                     <span id="magX-range1">0</span><span> &dash; </span>
                     <span id="magX-range2">100</span>
                   </div>
@@ -556,7 +564,7 @@
               <div class="col-sm-4">
                 <div id="magnetometer-box-1" style="display: none">
                   <div class="values">                  
-                    <label for="">Y axis: </label>
+                    <label>Y axis: </label>
                     <span id="magY-range1">0</span><span> &dash; </span>
                     <span id="magY-range2">100</span>
                   </div>
@@ -579,7 +587,7 @@
               <div class="col-sm-4">
                 <div id="magnetometer-box-2" style="display: none">
                   <div class="values">                  
-                    <label for="">Z axis: </label>
+                    <label >Z axis: </label>
                     <span id="magZ-range1">0</span><span> &dash; </span>
                     <span id="magZ-range2">100</span>
                   </div>
@@ -606,12 +614,12 @@
         <!-- orientation -->
         <div class="form-group mb-3">
           <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="orientation-check" />
-          <label for="orientation" class="col-form-label">Orientation Range</label>
+          <label class="col-form-label">Orientation Range</label>
             <div class="row g-4">
               <div class="col-sm-4">
                 <div id="orientation-box" style="display: none">
                   <div class="values">                  
-                    <label for="">X axis: </label>
+                    <label >X axis: </label>
                     <span id="orienX-range1">0</span><span> &dash; </span>
                     <span id="orienX-range2">100</span>
                   </div>
@@ -635,7 +643,7 @@
               <div class="col-sm-4">
                 <div id="orientation-box-1" style="display: none">
                   <div class="values">                  
-                    <label for="">Y axis: </label>
+                    <label >Y axis: </label>
                     <span id="orienY-range1">0</span><span> &dash; </span>
                     <span id="orienY-range2">100</span>
                   </div>
@@ -659,7 +667,7 @@
               <div class="col-sm-4">
                 <div id="orientation-box-2" style="display: none">
                   <div class="values">                  
-                    <label for="">Z axis: </label>
+                    <label >Z axis: </label>
                     <span id="orienZ-range1">0</span><span> &dash; </span>
                     <span id="orienZ-range2">100</span>
                   </div>
@@ -691,17 +699,23 @@
     </div>
   </div>
 
-  <div id="viewDiv"></div>
+  
+
+  <div id="viewDiv">
+  <div id="loading" style="display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; /*background: rgba(255, 255, 255, 0.8);*/ background: rgb(57 57 57 / 39%); z-index: 10; text-align: center; line-height: 50;">
+    <div class="spinner"></div>
+  </div>
+
+  </div>
   <div id="logoDiv" class="esri-widget">
     <img class="logo-img" src="{{ asset('ScooterLabLogo.png') }}" alt="Scooter Lab">
     <div id="basemapGalleryDiv"></div>
 
 
-
+    <script src="https://d3js.org/d3.v7.min.js"></script> 
 
     <!-- script loading -->
     <script src="https://js.arcgis.com/4.26/"></script>
-
     <script>
       var url = '{{ URL::asset('/fcapi') }}';
     </script>

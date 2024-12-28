@@ -24,7 +24,8 @@ class InterfcapiController extends Controller
     public function initData(){
         $user = Auth::user();
         if($user){
-            $response = Http::get($this->url.'/initData');
+            $response = Http::timeout(40)->get($this->url.'/initData');
+            echo $response;
             return $response;
         }
         abort(404);
@@ -43,13 +44,44 @@ class InterfcapiController extends Controller
         abort(404);
     }
 
-    // method to retrieve trips with only with GPS data
-    public function tripsGPS(){
+    // method to retrieve trips with only GPS data
+    public function tripsGPS(Request $request){
         $user = Auth::user();
         if($user){
             // use the following to check if the user has a certain role. Ex. admin
             // $isAdmin = $user->hasRole('ADMIN');
-            $response = Http::get($this->url.'/tripsGPS');
+
+            // Get all the query parameters from the GET request
+            $requestData = request()->query();
+            // Initialize an empty string to hold the concatenated result
+            $concatenatedString = '';
+            // Loop through each element in the query data
+            foreach ($requestData as $key => $value) {
+                // Concatenate key and value into the string
+                $concatenatedString .= $key . '=' . $value . ' ';
+            }
+            // dd($concatenatedString);
+            // add scooter model, scooter ID, and trip lists if available from the table (this is only related to controlled experiments) 
+
+
+            $response = Http::get($this->url.'/tripsGPS?'.$request);
+            return $response;
+        }
+        // not found. Has not access to the trips
+        abort(404);
+    }
+
+    // method to retrieve sensor data for a selected trip
+    public function tripData(Request $request){
+        // echo $request->get('id');
+        // return;
+        $user = Auth::user();
+        if($user){
+            // use the following to check if the user has a certain role. Ex. admin
+            // $isAdmin = $user->hasRole('ADMIN');
+            // $response = Http::get($this->url.'/tripsGPS');
+            // $response = Http::get($this->url.'/tripsGPS?ids=["'.$request->get('id').'"]');
+            $response = Http::get($this->url.'/trips?ids=["'.$request->get('id').'"]');
             return $response;
         }
         // not found. Has not access to the trips
