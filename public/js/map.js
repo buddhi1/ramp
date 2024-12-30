@@ -691,24 +691,24 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
             .then(data => {
                 // console.log(data[0])
 
-                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'], 'Accelerometer', 'Acc', 'Time (ms)');
-                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'], 'Gyroscope', 'Gyro', 'Time (ms)');
-                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'], 'Magnetometer', 'Mag', 'Time (ms)');
-                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'], 'Orientation', 'Val', 'Time (ms)');
-                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'], 'Altitude', 'Val', 'Time (ms)');
-                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Humidity', 'Val', 'Time (ms)');
-                const chartPress = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Pressure', 'Val', 'Time (ms)');
-                const chartTemp = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Temperature', 'Val', 'Time (ms)');
+                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'], 'Accelerometer', 'Amplitude', 'Time (S)');
+                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'], 'Gyroscope', 'Amplitude', 'Time (S)');
+                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'], 'Magnetometer', 'Amplitude', 'Amplitude (S)');
+                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'], 'Orientation', 'Amplitude', 'Time (S)');
+                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'], 'Altitude', 'Altitude', 'Time (S)');
+                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Humidity', 'Humidity', 'Time (S)');
+                const chartPress = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Pressure', 'Pressure', 'Time (S)');
+                const chartTemp = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Temperature', 'Temperature', 'Time (S)');
 
                 const textContent = `<h5>Trip ${tripID} (Scooter ${data[0].scooter_id})</h5>
                     <p><strong>Start Date:</strong> ${data[0].start_time}</p>
                     <p><strong>End Date:</strong> ${data[0].end_time}</p>
-                    <p><strong>Distance:</strong> ${data[0].distance}</p>
-                    <p><strong>Average Speed:</strong> ${data[0].avg_speed}</p>
-                    <p><strong>Max Speed:</strong> ${data[0].max_speed}</p>
-                    <p><strong>Min Speed:</strong> ${data[0].min_speed}</p>
-                    <p><strong>Start Battery:</strong> ${data[0].start_battery}</p>
-                    <p><strong>End Battery:</strong> ${data[0].end_battery}</p>
+                    <p><strong>Distance:</strong> ${data[0].distance} km</p>
+                    <p><strong>Average Speed:</strong> ${data[0].avg_speed} kmph</p>
+                    <p><strong>Max Speed:</strong> ${data[0].max_speed} kmph</p>
+                    <p><strong>Min Speed:</strong> ${data[0].min_speed} kmph</p>
+                    <p><strong>Start Battery:</strong> ${data[0].start_battery} W</p>
+                    <p><strong>End Battery:</strong> ${data[0].end_battery} W</p>
                     `;
                 // Append the text content (above charts)
                 const textDiv = document.createElement('div');
