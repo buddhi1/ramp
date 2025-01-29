@@ -10,6 +10,9 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\InterfcapiController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 
+use Illuminate\Http\Request;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -100,6 +103,10 @@ Route::get('fcapi-open/tripsGPS', function () {
 Route::get('fcapi-open/initData', function () {
     // $response = Http::get('192.168.214.103:5000/trips');
     $response = Http::get('192.168.214.103:5000/initData');
+    return $response;
+});
+Route::get('fcapi-open/tripData', function (Request $request) {
+    $response = Http::get('192.168.214.103:5000/trips?ids=["'.$request->get('id').'"]');
     return $response;
 });
 
