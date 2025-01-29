@@ -97,6 +97,11 @@ Route::get('fcapi-open/tripsGPS', function () {
     $response = Http::get('192.168.214.103:5000/tripsGPS');
     return $response;
 });
+Route::get('fcapi-open/initData', function () {
+    // $response = Http::get('192.168.214.103:5000/trips');
+    $response = Http::get('192.168.214.103:5000/initData');
+    return $response;
+});
 
 
 require __DIR__ . '/auth.php';

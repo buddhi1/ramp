@@ -496,7 +496,38 @@ function getHeatMapColor(value) {
 //     return chartDiv;
 // }
 
-function renderLineChart(data, lineNames, title, y_label, x_label) {
+// generate x-axis time labels for a given smapling rate and data size
+// samplingRate is in hertz
+function generateXAxis(samplingRate, numPoints, unit='s') {
+    const timeInterval = 1 / samplingRate; // Time interval in seconds
+    const xAxis = [];
+    let multiplier = 1; // Default is seconds
+
+    // Set multiplier based on the unit
+    switch (unit.toLowerCase()) {
+        case "ms":
+            multiplier = 1000;
+            break;
+        case "micros":
+            multiplier = 1e6;
+            break;
+        case "s":
+            multiplier = 1;
+            break;
+        default:
+            throw new Error("Invalid unit. Use 'seconds', 'milliseconds', or 'microseconds'.");
+    }
+    console.log(samplingRate+' '+timeInterval+' '+multiplier+' '+numPoints)
+
+    for (let i = 0; i < numPoints; i++) {
+        xAxis.push(i * timeInterval * multiplier);
+    }
+    
+    return xAxis;
+}
+
+// render line chart for a given array of values
+function renderLineChart(data, lineNames, samplingRate, unit, title, y_label, x_label) {
     // Create the chart container div
     const chartDiv = document.createElement('div');
     chartDiv.classList.add('chart-container');
@@ -511,9 +542,20 @@ function renderLineChart(data, lineNames, title, y_label, x_label) {
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+    // Generate x-values based on the sampling rate and value count
+    const xValues = generateXAxis(samplingRate, data[0].length, unit);
+    // console.log(xValues);
+    // console.log(xValues.length);
+    // console.log(width)
+
+    // Define D3 scale using the x-values
     const x = d3.scaleLinear()
-        .domain([0, data[0].length - 1])
+        .domain([xValues[0], xValues[xValues.length - 1]]) // Use the range of generated x-values
         .range([0, width]);
+    
+    // const x = d3.scaleLinear()
+    //     .domain([0, data[0].length - 1])
+    //     .range([0, width]);
 
     const y = d3.scaleLinear()
         .domain([d3.min(data.flat()), d3.max(data.flat())])  // Flatten 2D array to get the min/max values
@@ -623,7 +665,8 @@ function renderLineChart(data, lineNames, title, y_label, x_label) {
     // Double click reset to restore the full view
     svg.on('dblclick', function() {
         // Reset x-axis domain to show the full data range
-        x.domain([0, data[0].length - 1]);
+        // x.domain([0, data[0].length - 1]);
+        x.domain([xValues[0], xValues[xValues.length - 1]]) // Use the range of generated x-values
 
         // Reset the brush
         d3.select('.brush').call(brush.move, null);
@@ -660,8 +703,11 @@ function renderLineChart(data, lineNames, title, y_label, x_label) {
     return chartDiv;
 }
 
-
-
+// Function to convert "YYYY-MM-DD HH:MM:SS" format to a Date object
+function parseDate(dateStr) {
+    const isoDateStr = dateStr.trim().replace(" ", "T");
+    return new Date(isoDateStr);
+}
 
 // ------------------------------------------------------------------------------
 // Dynamically loads sensor data for a selected trip.
@@ -690,19 +736,22 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
             .then(response => response.json())
             .then(data => {
                 // console.log(data[0])
+                timeDiffSeconds=(parseDate(data[0].end_time)-parseDate(data[0].start_time))/1000
+                // console.log(timeDiffSeconds)
 
-                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'], 'Accelerometer', 'Amplitude', 'Time (S)');
-                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'], 'Gyroscope', 'Amplitude', 'Time (S)');
-                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'], 'Magnetometer', 'Amplitude', 'Amplitude (S)');
-                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'], 'Orientation', 'Amplitude', 'Time (S)');
-                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'], 'Altitude', 'Altitude', 'Time (S)');
-                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Humidity', 'Humidity', 'Time (S)');
-                const chartPress = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Pressure', 'Pressure', 'Time (S)');
-                const chartTemp = renderLineChart([data[0].sensor_data.humidity], ['x'], 'Temperature', 'Temperature', 'Time (S)');
+                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'],  (data[0].sensor_data.acc_x.length/timeDiffSeconds), 's', 'Accelerometer', 'Amplitude', 'Time (s)');
+                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'],  (data[0].sensor_data.gyro_x.length/timeDiffSeconds), 's', 'Gyroscope', 'Amplitude', 'Time (s)');
+                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'],  (data[0].sensor_data.mag_x.length/timeDiffSeconds), 's', 'Magnetometer', 'Amplitude', 'Amplitude (s)');
+                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'],  (data[0].sensor_data.pitch.length/timeDiffSeconds), 's', 'Orientation', 'Amplitude', 'Time (s)');
+                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'],  (data[0].sensor_data.altitude.length/timeDiffSeconds), 's', 'Altitude', 'Altitude', 'Time (s)');
+                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'],  (data[0].sensor_data.humidity.length/timeDiffSeconds), 's', 'Humidity', 'Humidity', 'Time (s)');
+                const chartPress = renderLineChart([data[0].sensor_data.pressure], ['x'],  (data[0].sensor_data.pressure.length/timeDiffSeconds), 's', 'Pressure', 'Pressure', 'Time (s)');
+                const chartTemp = renderLineChart([data[0].sensor_data.temperature], ['x'],  (data[0].sensor_data.temperature.length/timeDiffSeconds), 's', 'Temperature', 'Temperature', 'Time (s)');
 
                 const textContent = `<h5>Trip ${tripID} (Scooter ${data[0].scooter_id})</h5>
                     <p><strong>Start Date:</strong> ${data[0].start_time}</p>
                     <p><strong>End Date:</strong> ${data[0].end_time}</p>
+                    <p><strong>Trip Duration:</strong> ${Math.floor(timeDiffSeconds/60*10)/10} minutes</p>
                     <p><strong>Distance:</strong> ${data[0].distance} km</p>
                     <p><strong>Average Speed:</strong> ${data[0].avg_speed} kmph</p>
                     <p><strong>Max Speed:</strong> ${data[0].max_speed} kmph</p>
