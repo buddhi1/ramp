@@ -69,4 +69,8 @@ class Kernel extends HttpKernel
         'attachrole' => \App\Http\Middleware\AttachRoleToUser::class,
         '2fa' => \App\Http\Middleware\Middleware2FA::class,
     ];
+
+    protected $routeMiddleware = [
+        'cors' => \App\Http\Middleware\CorsMiddleware::class,
+    ];
 }
