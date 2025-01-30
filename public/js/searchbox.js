@@ -35,10 +35,10 @@ let distanceBoxOne = document.getElementById("distance-box-1");
 let distanceBoxTwo = document.getElementById("distance-box-2");
 let distanceCheck = document.getElementById("distance-check");
 
-let temparatureBox = document.getElementById("temparature-box");
-let temparatureBoxOne = document.getElementById("temparature-box-1");
-let temparatureBoxTwo = document.getElementById("temparature-box-2");
-let temparatureCheck = document.getElementById("temparature-check");
+let temperatureBox = document.getElementById("temperature-box");
+let temperatureBoxOne = document.getElementById("temperature-box-1");
+let temperatureBoxTwo = document.getElementById("temperature-box-2");
+let temperatureCheck = document.getElementById("temperature-check");
 
 let pressureBox = document.getElementById("pressure-box");
 let pressureBoxOne = document.getElementById("pressure-box-1");
@@ -172,20 +172,20 @@ distanceCheck.onchange = function(){
     }
 }
 
-temparatureCheck.onchange = function(){
-    // console.log(temparatureCheck.checked)
-    if(temparatureCheck.checked){
-        temparatureBox.style.display = "block";
-        temparatureBoxOne.style.display = "block";
-        temparatureBoxTwo.style.display = "block";
+temperatureCheck.onchange = function(){
+    // console.log(temperatureCheck.checked)
+    if(temperatureCheck.checked){
+        temperatureBox.style.display = "block";
+        temperatureBoxOne.style.display = "block";
+        temperatureBoxTwo.style.display = "block";
 
         slideOne();
         slideTwo();
         
     }else {
-        temparatureBox.style.display = "none";
-        temparatureBoxOne.style.display = "none";
-        temparatureBoxTwo.style.display = "none";
+        temperatureBox.style.display = "none";
+        temperatureBoxOne.style.display = "none";
+        temperatureBoxTwo.style.display = "none";
 
     }
 }

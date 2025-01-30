@@ -43,10 +43,10 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
 
     
 
-    if(startTime=='' || endTime==''){
-      loadingDiv.style.display = "none";
-      alert('Currently this functinality is limited to filter by dates.\nPlease select a date range to proceed.')
-    }
+    // if(startTime=='' || endTime==''){
+    //   loadingDiv.style.display = "none";
+    //   alert('Currently this functinality is limited to filter by dates.\nPlease select a date range to proceed.')
+    // }
 
     // following concats aree needed since API looks for seconds as well
     if(startTime!=''){
@@ -78,7 +78,6 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
         start_time: startTime,
         end_time: endTime,
       });
-
 
     // Send request
     fetch(apiUrl)
@@ -131,8 +130,8 @@ function gatherAttributeIds() {
   if (document.getElementById("speed-check").checked) {
     attributes.push("speed");
   }
-  if (document.getElementById("temparature-check").checked) {
-    attributes.push("temparature");
+  if (document.getElementById("temperature-check").checked) {
+    attributes.push("temperature");
   }
   if (document.getElementById("pressure-check").checked) {
     attributes.push("pressure");
@@ -172,7 +171,7 @@ function gatherMeasures() {
   let distanceMeasure = document.getElementById("select-distance");
   let energySpentMeasure = document.getElementById("select-energy");
   let speedMeasure = document.getElementById("select-speed");
-  let temparatureMeasure = document.getElementById("select-temparature");
+  let temperatureMeasure = document.getElementById("select-temperature");
   let pressureMeasure = document.getElementById("select-pressure");
   let humidityMeasure = document.getElementById("select-humidity");
   let lightMeasure = document.getElementById("select-light");
@@ -190,45 +189,45 @@ function gatherMeasures() {
   let orientationRollMeasure = document.getElementById("select-orientationz");
 
   if (document.getElementById("distance-check").checked) {
-    measures.push(distanceMeasure.value);
+    measures.push(distanceMeasure.value.toLowerCase());
   }
   if (document.getElementById("energy-spent-check").checked) {
-    measures.push(energySpentMeasure.value);
+    measures.push(energySpentMeasure.value.toLowerCase());
   }
   if (document.getElementById("speed-check").checked) {
-    measures.push(speedMeasure.value);
+    measures.push(speedMeasure.value.toLowerCase());
   }
-  if (document.getElementById("temparature-check").checked) {
-    measures.push(temparatureMeasure.value);
+  if (document.getElementById("temperature-check").checked) {
+    measures.push(temperatureMeasure.value.toLowerCase());
   }
   if (document.getElementById("pressure-check").checked) {
-    measures.push(pressureMeasure.value);
+    measures.push(pressureMeasure.value.toLowerCase());
   }
   if (document.getElementById("humidity-check").checked) {
-    measures.push(humidityMeasure.value);
+    measures.push(humidityMeasure.value.toLowerCase());
   }
   if (document.getElementById("light-check").checked) {
-    measures.push(lightMeasure.value);
+    measures.push(lightMeasure.value.toLowerCase());
   }
   if (document.getElementById("acceleration-check").checked) {
-    measures.push(accelerationXMeasure.value);
-    measures.push(accelerationYMeasure.value);
-    measures.push(accelerationZMeasure.value);
+    measures.push(accelerationXMeasure.value.toLowerCase());
+    measures.push(accelerationYMeasure.value.toLowerCase());
+    measures.push(accelerationZMeasure.value.toLowerCase());
   }
   if (document.getElementById("gyroscope-check").checked) {
-    measures.push(gyroscopeXMeasure.value);
-    measures.push(gyroscopeYMeasure.value);
-    measures.push(gyroscopeZMeasure.value);
+    measures.push(gyroscopeXMeasure.value.toLowerCase());
+    measures.push(gyroscopeYMeasure.value.toLowerCase());
+    measures.push(gyroscopeZMeasure.value.toLowerCase());
   }
   if (document.getElementById("magnetometer-check").checked) {
-    measures.push(magnetometerXMeasure.value);
-    measures.push(magnetometerYMeasure.value);
-    measures.push(magnetometerZMeasure.value);
+    measures.push(magnetometerXMeasure.value.toLowerCase());
+    measures.push(magnetometerYMeasure.value.toLowerCase());
+    measures.push(magnetometerZMeasure.value.toLowerCase());
   }
   if (document.getElementById("orientation-check").checked) {
-    measures.push(orientationYawMeasure.value);
-    measures.push(orientationPitchMeasure.value);
-    measures.push(orientationRollMeasure.value);
+    measures.push(orientationYawMeasure.value.toLowerCase());
+    measures.push(orientationPitchMeasure.value.toLowerCase());
+    measures.push(orientationRollMeasure.value.toLowerCase());
   }
 
   return measures;
@@ -242,8 +241,8 @@ function gatherValues() {
   let energyslider2 = document.getElementById("energy-slider-2");
   let sppedslider1 = document.getElementById("speed-slider-1");
   let sppedslider2 = document.getElementById("speed-slider-2");
-  let tempslider1 = document.getElementById("temp-slider-1");
   let tempslider2 = document.getElementById("temp-slider-2");
+  let tempslider1 = document.getElementById("temp-slider-1");
   let pressureslider1 = document.getElementById("pressure-slider-1");
   let pressureslider2 = document.getElementById("pressure-slider-2");
   let humidityslider1 = document.getElementById("humidity-slider-1");
@@ -284,7 +283,7 @@ function gatherValues() {
   if (document.getElementById("speed-check").checked) {
     values.push([sppedslider1.value, sppedslider2.value]);
   }
-  if (document.getElementById("temparature-check").checked) {
+  if (document.getElementById("temperature-check").checked) {
     values.push([tempslider1.value, tempslider2.value]);
   }
   if (document.getElementById("pressure-check").checked) {
@@ -336,9 +335,9 @@ function gatherSortOrders() {
   if (document.getElementById("speed-check").checked) {
     sortOrders.push(speedSort.value);
   }
-  let temparatureSort = document.getElementById("sortTemp");
-  if (document.getElementById("temparature-check").checked) {
-    sortOrders.push(temparatureSort.value);
+  let temperatureSort = document.getElementById("sortTemp");
+  if (document.getElementById("temperature-check").checked) {
+    sortOrders.push(temperatureSort.value);
   }
   let pressureSort = document.getElementById("sortPressure");
   if (document.getElementById("pressure-check").checked) {

@@ -517,7 +517,7 @@ function generateXAxis(samplingRate, numPoints, unit='s') {
         default:
             throw new Error("Invalid unit. Use 'seconds', 'milliseconds', or 'microseconds'.");
     }
-    console.log(samplingRate+' '+timeInterval+' '+multiplier+' '+numPoints)
+    // console.log(samplingRate+' '+timeInterval+' '+multiplier+' '+numPoints)
 
     for (let i = 0; i < numPoints; i++) {
         xAxis.push(i * timeInterval * multiplier);

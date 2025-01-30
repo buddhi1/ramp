@@ -61,7 +61,9 @@ class InterfcapiController extends Controller
             //     $concatenatedString .= $key . '=' . $value . ' ';
             // }
             // dd($concatenatedString);
+            // dd("test");
             // add scooter model, scooter ID, and trip lists if available from the table (this is only related to controlled experiments) 
+            // dd($request->getQueryString());
             $response = Http::get($this->url.'/tripsGPS?'.$request->getQueryString());
             return $response;
         }

@@ -193,14 +193,14 @@
           </div>
         </div>
         <!-- speed range ends -->
-        <!-- temparature -->
+        <!-- temperature -->
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
-            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="temparature-check" />
-            <label>Temparature:</label>
+            <input class="form-check-input" type="checkbox" style="margin-right: 3px" value="" id="temperature-check" />
+            <label>Temperature:</label>
           </div>
           <div class="col-4">
-            <div id="temparature-box" style="display: none">
+            <div id="temperature-box" style="display: none">
               <div class="values">
                 <span id="temp-range1">0</span><span> &dash; </span>
                 <span id="temp-range2">100</span>
@@ -214,7 +214,7 @@
             </div>
           </div>
           <div class="col-4">
-            <div style="margin-left: 15px; display: none" id="temparature-box-1">
+            <div style="margin-left: 15px; display: none" id="temperature-box-1">
               <div class="input-group  mb-3">
                 <select class="form-select" id="sortTemp">
                   <option value="NONE">No Sort</option>
@@ -225,9 +225,9 @@
             </div>
           </div>
           <div class="col-4">
-            <div id="temparature-box-2" style="display: none;">
+            <div id="temperature-box-2" style="display: none;">
               <div class="input-group mb-3">
-                <select class="form-select" id="select-temparature">
+                <select class="form-select" id="select-temperature">
                   <option>Value</option>
                   <option>Average</option>
                   <option>Max</option>
@@ -237,7 +237,7 @@
             </div>
           </div>
         </div>
-        <!-- temparature end -->
+        <!-- temperature end -->
         <!-- pressure -->
         <div class="mb-3 row">
           <div class="form-check" style="margin-left: 12px;">
@@ -253,8 +253,8 @@
               <!-- Slider -->
               <div class="container1">
                 <div class="slider-track4"></div>
-                <input type="range" min="0" max="100" value="30" id="pressure-slider-1" oninput="slideOne()">
-                <input type="range" min="0" max="100" value="70" id="pressure-slider-2" oninput="slideTwo()">
+                <input type="range" min="970" max="995" value="980" id="pressure-slider-1" oninput="slideOne()">
+                <input type="range" min="970" max="995" value="990" id="pressure-slider-2" oninput="slideTwo()">
               </div>
             </div>
           </div>
