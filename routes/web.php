@@ -68,6 +68,10 @@ Route::middleware('auth')->group(function () {
     // trip data downloading using a seperate module
     Route::post('/downloadTrips', [DownloadController::class, 'trips'])->name('download.trips');
 });
+// statsTool view
+Route::get('/statsTool', function () {
+    return view('statsTool.index');
+})->middleware(['auth', 'attachrole', '2fa']);
 
 // intermediery FC API
 Route::middleware('auth')->group(function () {
