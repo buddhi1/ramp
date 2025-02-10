@@ -43,6 +43,7 @@ Route::middleware(['auth', 'attachrole', '2fa'])->group(function () {
     Route::get('/profile/enable2fa', [ProfileController::class, 'enable2fa'])->name('profile.enable2FA');
     Route::post('/profile/disable2fa/{user}', [ProfileController::class, 'disable2fa'])->name('profile.disable2FA');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/users', [UsersController::class, 'update'])->name('users.update');
 
     Route::post('/download', [ProjectController::class, 'download'])->name('projects.download');
     Route::middleware('admin')->group(function () {

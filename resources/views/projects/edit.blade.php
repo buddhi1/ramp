@@ -9,31 +9,31 @@
     $start_time = $project->start_time; // Example epoch timestamp
     $end_time = $project->end_time; // Example epoch timestamp
     $selectedStatus = $project->status;
-    echo "<script>
-                                                                    console.log('Debug Objects: " . $start_time . "');
-                                                                    </script>";
+    
     $statusProps = [
         'ACTIVE' => 'ACTIVE',
         'INACTIVE' => 'INACTIVE',
         'PENDING' => 'PENDING',
-        'COMPLETE' => 'COMPLETE',
-        // and so on...
+        'COMPLETE' => 'COMPLETE'
     ];
 
     $downloadTypes = [
         'CSV' => 'CSV',
         'JSON' => 'JSON'
-        // and so on...
     ];
 
     $typeProps = [
         'PUBLIC' => 'PUBLIC',
-        'PRIVATE' => 'PRIVATE',
-        // and so on...
+        'PRIVATE' => 'PRIVATE'
     ];
 @endphp
-
-
+<html>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <style>
         .time-slot {
             display: none;
@@ -154,17 +154,10 @@
             height: 20px;
         }
     </style>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('.selectpicker').selectpicker({
-            actionsBox: true,
-            liveSearch: true,
-            width: '100%'
-        });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
+    </head>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
         function decrement(e) {
             const target = e.target.parentNode.querySelector('input[type="number"]');
             let value = Number(target.value);
@@ -192,45 +185,8 @@
             btn.addEventListener("click", increment);
         });
     });
-
-    function toggleTimeSlot(day) {
-        const row = document.getElementById(`day_${day}`).closest('.day-row');
-        const timeSlot = document.getElementById(`time_${day}`);
-        
-        if (row.querySelector('input[type="checkbox"]').checked) {
-            timeSlot.classList.add('active');
-            row.classList.remove('disabled');
-        } else {
-            timeSlot.classList.remove('active');
-            row.classList.add('disabled');
-        }
-    }
-
-    function toggleSchedule() {
-        const content = document.querySelector('.schedule-content');
-        const icon = document.querySelector('.collapse-icon');
-        
-        content.classList.toggle('collapsed');
-        icon.classList.toggle('collapsed');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const timeInputs = document.querySelectorAll('input[type="time"]');
-        timeInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                const row = this.closest('.day-row');
-                const startTime = row.querySelector('input[name^="start_time"]').value;
-                const endTime = row.querySelector('input[name^="end_time"]').value;
-                
-                if (startTime && endTime && startTime >= endTime) {
-                    alert('End time must be after start time');
-                    this.value = this.defaultValue;
-                }
-            });
-        });
-    });
-    
-</script>
+        </script>
+<section>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -391,7 +347,7 @@
         </div>
     </div>
     <div class="w-full mx-auto sm:px-6 lg:px-8 space-y-2 pb-12">
-        <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+        <!-- <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
             <div class="max-w-xl">
                 <div class="">
                     <div>
@@ -424,8 +380,57 @@
             @if (session('status') === 'download-success')
                 <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-gray-600 dark:text-gray-400">{{ __('Download complete') }}</p>
-            @endif
+            @endif -->
             <!-- </div> -->
-        </div>
+        <!-- </div> -->
+         
     </div>
 </x-app-layout>
+</section>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('select').selectpicker();
+    });
+</script>
+<script>
+    
+
+    function toggleTimeSlot(day) {
+        const row = document.getElementById(`day_${day}`).closest('.day-row');
+        const timeSlot = document.getElementById(`time_${day}`);
+        
+        if (row.querySelector('input[type="checkbox"]').checked) {
+            timeSlot.classList.add('active');
+            row.classList.remove('disabled');
+        } else {
+            timeSlot.classList.remove('active');
+            row.classList.add('disabled');
+        }
+    }
+
+    function toggleSchedule() {
+        const content = document.querySelector('.schedule-content');
+        const icon = document.querySelector('.collapse-icon');
+        
+        content.classList.toggle('collapsed');
+        icon.classList.toggle('collapsed');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const timeInputs = document.querySelectorAll('input[type="time"]');
+        timeInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const row = this.closest('.day-row');
+                const startTime = row.querySelector('input[name^="start_time"]').value;
+                const endTime = row.querySelector('input[name^="end_time"]').value;
+                
+                if (startTime && endTime && startTime >= endTime) {
+                    alert('End time must be after start time');
+                    this.value = this.defaultValue;
+                }
+            });
+        });
+    });
+    
+</script>
+</html>

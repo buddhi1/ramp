@@ -180,7 +180,10 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         function decrement(e) {
-            const target = e.target.parentNode.querySelector('input[type="number"]');
+            const btn = e.target.closest('[data-action="decrement"]');
+            if (!btn) return;
+            
+            const target = btn.parentNode.querySelector('input[type="number"]');
             let value = Number(target.value);
             if (value > 0) {
                 value--;
@@ -189,14 +192,17 @@
         }
 
         function increment(e) {
-            const target = e.target.parentNode.querySelector('input[type="number"]');
+            const btn = e.target.closest('[data-action="increment"]');
+            if (!btn) return;
+            
+            const target = btn.parentNode.querySelector('input[type="number"]');
             let value = Number(target.value);
             value++;
             target.value = value;
         }
 
-        const decrementButtons = document.querySelectorAll('button[data-action="decrement"]');
-        const incrementButtons = document.querySelectorAll('button[data-action="increment"]');
+        const decrementButtons = document.querySelectorAll('[data-action="decrement"]');
+        const incrementButtons = document.querySelectorAll('[data-action="increment"]');
 
         decrementButtons.forEach(btn => {
             btn.addEventListener("click", decrement);
@@ -208,13 +214,13 @@
     });
 </script>
 
-<section class="bg-white p-6 rounded-md">
-    <header class="mb-4">
+<section class="bg-white rounded-md">
+    <!-- <header class="mb-4">
         <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">
             {{ __('Create Project') }}
         </h2>
         <div class="w-fill bg-gray-300 mt-2"> </div>
-    </header>
+    </header> -->
 
     @if ($errors->any())
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -256,17 +262,21 @@
             <div class="custom-number-input">
                 <x-input-label for="fleet_number" :value="__('Fleet Selection')" />
                 <div class="flex items-center h-10 w-full rounded-lg relative bg-transparent mt-1">
-                    <button type="button" data-action="decrement"
-                        class="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-10 rounded-l cursor-pointer outline-none">
-                        <span class="m-auto text-2xl font-thin">−</span>
-                    </button>
+                    <div data-action="decrement"
+                        class="flex-1 h-full w-10 rounded-l cursor-pointer px-2 bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400">
+                        <button type="button" class="w-full h-full flex items-center justify-center">
+                            <span class="text-2xl font-thin select-none">−</span>
+                        </button>
+                    </div>
                     <input type="number"
                         class="outline-none focus:outline-none text-center w-full bg-gray-100 font-semibold text-md hover:text-black focus:text-black md:text-base flex items-center text-gray-700"
                         name="fleet_number" value="0" min="0">
-                    <button type="button" data-action="increment"
-                        class="bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400 h-full w-10 rounded-r cursor-pointer">
-                        <span class="m-auto text-2xl font-thin">+</span>
-                    </button>
+                    <div data-action="increment"
+                        class="flex-1 h-full w-10 rounded-r cursor-pointer px-2 bg-gray-300 text-gray-600 hover:text-gray-700 hover:bg-gray-400">
+                        <button type="button" class="w-full h-full flex items-center justify-center">
+                            <span class="text-2xl font-thin select-none">+</span>
+                        </button>
+                    </div>
                 </div>
                 <x-input-error :messages="$errors->get('fleet_number')" class="mt-2" />
             </div>
@@ -310,6 +320,17 @@
                 </div>
 
                 <div class="schedule-content">
+                    <div class="day-row border-b-2 border-gray-300 mb-2">
+                        <div class="day-checkbox-wrapper">
+                            <input type="checkbox" 
+                                   id="select_all_days" 
+                                   class="day-checkbox"
+                                   onchange="toggleAllDays()"
+                                   checked>
+                            <label for="select_all_days" class="day-label font-bold">Select All (24hr)</label>
+                        </div>
+                    </div>
+
                     @foreach($daysOfWeek as $value => $label)
                     <div class="day-row">
                         <div class="day-checkbox-wrapper">
@@ -345,16 +366,6 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div>
-                <x-input-label for="select_attrbs[]" :value="__('Select Attributes')" />
-                <x-custom-select-input name="select_attrbs[]"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" id="select_attrbs[]"
-                    :options="$attributeProps" />
-                <x-input-error :messages="$errors->get('select_attrbs[]')" class="mt-2" />
-            </div>
-        </div>
-
         <div class="flex items-right justify-end gap-4 mt-6">
             <x-primary-button type="submit">{{ __('Create Project') }}</x-primary-button>
 
@@ -371,33 +382,62 @@
     });
 </script>
 <script>
+    function toggleAllDays() {
+        const selectAllCheckbox = document.getElementById('select_all_days');
+        const dayCheckboxes = document.querySelectorAll('.day-checkbox:not(#select_all_days)');
+        const allChecked = selectAllCheckbox.checked;
+        
+        dayCheckboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+            const day = checkbox.value;
+            const timeSlot = document.getElementById(`time_${day}`);
+            const row = checkbox.closest('.day-row');
+            
+            if (allChecked) {
+                timeSlot.classList.add('active');
+                row.classList.remove('disabled');
+                // Set 24 hour schedule
+                row.querySelector('input[name^="start_time_"]').value = '00:00';
+                row.querySelector('input[name^="end_time_"]').value = '23:59';
+            } else {
+                timeSlot.classList.remove('active');
+                row.classList.add('disabled');
+                // Reset to default times
+                row.querySelector('input[name^="start_time_"]').value = '09:00';
+                row.querySelector('input[name^="end_time_"]').value = '17:00';
+            }
+        });
+    }
+
     function toggleTimeSlot(day) {
-        const row = document.getElementById(`day_${day}`).closest('.day-row');
+        const checkbox = document.getElementById(`day_${day}`);
+        const row = checkbox.closest('.day-row');
         const timeSlot = document.getElementById(`time_${day}`);
         
-        if (row.querySelector('input[type="checkbox"]').checked) {
+        if (checkbox.checked) {
             timeSlot.classList.add('active');
             row.classList.remove('disabled');
         } else {
             timeSlot.classList.remove('active');
             row.classList.add('disabled');
         }
+
+        // Update select all checkbox state
+        const allDayCheckboxes = document.querySelectorAll('.day-checkbox:not(#select_all_days)');
+        const selectAllCheckbox = document.getElementById('select_all_days');
+        const allChecked = Array.from(allDayCheckboxes).every(cb => cb.checked);
+        selectAllCheckbox.checked = allChecked;
     }
 
-    // Optional: Add this if you want to validate that end time is after start time
+    // Add event listener when document is loaded
     document.addEventListener('DOMContentLoaded', function() {
-        const timeInputs = document.querySelectorAll('input[type="time"]');
-        timeInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                const row = this.closest('.day-row');
-                const startTime = row.querySelector('input[name^="start_time"]').value;
-                const endTime = row.querySelector('input[name^="end_time"]').value;
-                
-                if (startTime && endTime && startTime >= endTime) {
-                    alert('End time must be after start time');
-                    this.value = this.defaultValue;
-                }
-            });
+        const selectAllCheckbox = document.getElementById('select_all_days');
+        selectAllCheckbox.addEventListener('change', toggleAllDays);
+        
+        // Initialize all checkboxes
+        const dayCheckboxes = document.querySelectorAll('.day-checkbox:not(#select_all_days)');
+        dayCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => toggleTimeSlot(checkbox.value));
         });
     });
 

@@ -41,26 +41,31 @@ class UsersController extends Controller
     public function update(Request $request, User $user)
     {
         $user_to_update = User::find($user->id);
-        $user_to_update->name = $request->name;
+        
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ];
 
-        // $request->validate($rules);
+        // Validate the request
+        $validated = $request->validate($rules);
+
+        // Update user details
+        $user_to_update->name = $validated['name'];
+        $user_to_update->email = $validated['email'];
+
+        // Reset email verification if email changed
+        if ($user_to_update->isDirty('email')) {
+            $user_to_update->email_verified_at = null;
+        }
 
         $user_to_update->save();
-        // $request->user()->fill($request->validated());
 
-        // if ($request->user()->isDirty('email')) {
-        //     $request->user()->email_verified_at = null;
-        // }
-
-        // $request->user()->save();
         if($request->role){
             $user->roles()->detach();
             $user->assignRole(Role::where('name', $request->role)->first());
         }
+        
         return Redirect::route('users.edit', ['user' => $user->id])->with('status', 'profile-updated');
     }
 
