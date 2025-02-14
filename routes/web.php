@@ -100,22 +100,22 @@ Route::middleware('auth')->group(function () {
 // });
 
 // CORS enabled temp solution to handle FC api calls. This is used by the front-end developer for his local dev workflow
-Route::middleware(['cors'])->group(function () {
-    // http://172.20.215.102:8008/fcapi-open/tripsGPS
-    Route::get('fcapi-open/tripsGPS', function () {
-        // $response = Http::get('192.168.214.103:5000/trips');
-        $response = Http::get('192.168.214.103:5001/tripsGPS');
-        return $response;
-    });
-    Route::get('fcapi-open/initData', function () {
-        // $response = Http::get('192.168.214.103:5000/trips');
-        $response = Http::get('192.168.214.103:5001/initData');
-        return $response;
-    });
-    Route::get('fcapi-open/tripData', function (Request $request) {
-        $response = Http::get('192.168.214.103:5001/trips?ids=["'.$request->get('id').'"]');
-        return $response;
-    });
-});
+// Route::middleware(['cors'])->group(function () {
+//     // http://172.20.215.102:8008/fcapi-open/tripsGPS
+//     Route::get('fcapi-open/tripsGPS', function () {
+//         // $response = Http::get('192.168.214.103:5000/trips');
+//         $response = Http::get('192.168.214.103:5001/tripsGPS');
+//         return $response;
+//     });
+//     Route::get('fcapi-open/initData', function () {
+//         // $response = Http::get('192.168.214.103:5000/trips');
+//         $response = Http::get('192.168.214.103:5001/initData');
+//         return $response;
+//     });
+//     Route::get('fcapi-open/tripData', function (Request $request) {
+//         $response = Http::get('192.168.214.103:5001/trips?ids=["'.$request->get('id').'"]');
+//         return $response;
+//     });
+// });
 
 require __DIR__ . '/auth.php';
