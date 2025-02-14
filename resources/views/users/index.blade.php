@@ -8,7 +8,7 @@ foreach ($users as $user) {
         'name' => $user->name,
         'type' => $user->email,
         'role' => $user->roles[0]->name ?? 'USER',
-        'status' => "ACTIVE",
+        'status' => $user->email_verified_at ? 'Verified' : 'Unverified',
         'action' => '<a href="'.route('users.edit', $user->id).'"><x-primary-button>Edit</x-primary-button></a>',
     ];
 }

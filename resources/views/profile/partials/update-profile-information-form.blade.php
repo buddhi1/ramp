@@ -21,7 +21,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('users.update', $user->id) }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ auth()->user()->isAdmin() ? route('users.update', $user->id) : route('profile.update', $user->id) }}" class="mt-6 space-y-6">
         @csrf
         @method('put')
 
@@ -54,11 +54,28 @@
                 </div>
             @endif
         </div>
+        <!-- <div>
+            <p class="mt-2 text-sm text-gray-800 dark:text-gray-200">
+                @if ($user->email_verified_at)
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-200 dark:text-green-800">
+                        {{ __('Verified') }}
+                    </span>
+                @else
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-200 dark:text-red-800">
+                        {{ __('Not verified') }}
+                    </span>
+                @endif
+            </p>
+        </div> -->
 
         <div>
             <x-input-label for="role" :value="__('Role')" />
-            <x-select-input name="role" id="role"
+            @if (auth()->user()->roles[0]->name === 'ADMIN')
+                <x-select-input name="role" id="role"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" :selected="$user->roles[0]->name ?? 'USER'" :options="$rolesProps" />
+            @else
+                <x-text-input id="role" value="{{ $user->roles[0]->name ?? 'USER' }}" class="mt-1 block w-full" readonly />
+            @endif
             <x-input-error class="mt-2" :messages="$errors->get('role')" />
         </div>
 
@@ -67,12 +84,12 @@
 
             @if (session('status') === 'profile-updated')
                 <p
-                    x-data="{ show: true }"
+                    x-data="{ show: true }" 
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('Saved.') }}</p>
+                    class="text-sm text-green-600 dark:text-green-400 rounded-md p-2 bg-green-100 dark:bg-green-200">
+                {{ __('Saved.') }}</p>
             @endif
         </div>
     </form>

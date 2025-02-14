@@ -66,7 +66,7 @@ class ProjectController extends Controller
                 'irb_data' => 'required',
                 'status' => 'required',
                 'fleet_number' => 'required',
-                'selected_days' => 'required|array',
+                'selected_days' => 'array',
                 'selected_days.*' => 'string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             ]);
 
@@ -89,14 +89,28 @@ class ProjectController extends Controller
                 'fleet_number' => $request->fleet_number
             ]);
 
-            // Process schedule data
+            // Process schedule data with default 24/7 if no days selected
             $scheduleData = [];
-            foreach ($request->selected_days as $day) {
-                $scheduleData[$day] = [
-                    'enabled' => true,
-                    'start_time' => $request->input("start_time_$day", "09:00"),
-                    'end_time' => $request->input("end_time_$day", "17:00"),
-                ];
+            $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            if (empty($request->selected_days)) {
+                // Set 24/7 schedule for all days if none selected
+                foreach ($daysOfWeek as $day) {
+                    $scheduleData[$day] = [
+                        'enabled' => true,
+                        'start_time' => '00:00',
+                        'end_time' => '23:59',
+                    ];
+                }
+            } else {
+                // Use selected schedule
+                foreach ($request->selected_days as $day) {
+                    $scheduleData[$day] = [
+                        'enabled' => true,
+                        'start_time' => $request->input("start_time_$day", "09:00"),
+                        'end_time' => $request->input("end_time_$day", "17:00"),
+                    ];
+                }
             }
 
             // Create schedule record
