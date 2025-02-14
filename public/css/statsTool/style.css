@@ -1,0 +1,187 @@
+/* General Styles */
+.container {
+    display: flex;
+    
+    height: 100vh;
+}
+
+.left-column {
+    width: 70%;
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    position: relative;
+}
+
+.right-column {
+    width: 30%;
+    padding: 20px;
+    margin-right: 15px;
+    overflow-y: auto;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Table Container */
+#table-container {
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 8px 6px;
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background-color: #001e3b;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+tr:nth-child(even) {
+    background-color: #f3f8ff;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+/* Bookmark Tab */
+.bookmark-tab {
+    position: absolute;
+    top: 60px;
+    right: 35px;
+    padding: 10px 15px;
+    background-color: #001e3b;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+.bookmark-tab:hover {
+    background-color: #005bb5;
+}
+
+/* Input Row */
+.input-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Trip Input Box */
+.tripInputBox {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 97%;
+}
+.tripInputBox label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+.tripInputBox select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.tripInputBox select:focus {
+    border-color: #0078d7;
+    box-shadow: 0px 2px 6px rgba(0, 120, 215, 0.2);
+}
+
+/* Sensor Type */
+.sensorType {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.sensorType label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+.sensorType select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+.sensorType select:focus {
+    border-color: #0078d7;
+    box-shadow: 0px 2px 6px rgba(0, 120, 215, 0.2);
+}
+
+/* Button Styles */
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #0078d7;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+button:hover {
+    background-color: #005bb5;
+    transform: scale(1.05);
+}
+
+/* Chart container */
+
+#chart-container .chart-wrapper {
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+#chart-container .chart-wrapper h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    text-align: center;
+    color: #444;
+}
