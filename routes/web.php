@@ -93,7 +93,6 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-
 // Route::get('fcapi/initData', function () {
 //     $response = Http::get('192.168.214.103:5000/initData');
 //     return $response;
@@ -105,6 +104,11 @@ Route::middleware(['cors'])->group(function () {
     Route::get('fcapi-open/tripsGPS', function () {
         // $response = Http::get('192.168.214.103:5000/trips');
         $response = Http::get('192.168.214.103:5001/tripsGPS');
+        return $response;
+    });
+    Route::get('fcapi-open/trips', function () {
+        // $response = Http::get('192.168.214.103:5000/trips');
+        $response = Http::get('192.168.214.103:5001/trips?start_time=2025-02-10T08:00:00&end_time=2025-02-25T22:59:00');
         return $response;
     });
     Route::get('fcapi-open/initData', function () {

@@ -33,7 +33,7 @@ async function fetchTripsAndRender() {
 // ----------------------------------------------------------------------------------
 //fetches trip data and renders them on the map.
 // ----------------------------------------------------------------------------------
-function renderScooterTrips(trips) {    
+function renderScooterTrips(trips) { 
     require([
         "esri/config",
         "esri/Map",
@@ -50,9 +50,10 @@ function renderScooterTrips(trips) {
         "esri/widgets/Expand",
 
         "esri/widgets/Sketch",
+        "esri/geometry/support/webMercatorUtils",
         "esri/geometry/geometryEngine"
     
-        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand, Sketch, geometryEngine) {
+        ], function(esriConfig, Map, MapView, Search, Graphic, GraphicsLayer, Extent, SpatialReference, BasemapToggle, BasemapGallery, Expand, Sketch, webMercatorUtils, geometryEngine) {
             esriConfig.apiKey="AAPK7c7d215fcd9848cb80732ee818643c4dup3DhD1dsH1W--DI1Mh8vEFyp0faPvPhi2POkUdUUpPBjP8HcEzkxwKimIOeFngf";
     
         const loadingDiv = document.getElementById("loading");
@@ -84,6 +85,39 @@ function renderScooterTrips(trips) {
                 graphicsLayer.add(getScooterTripAllCont(Graphic, trip, trips.length, i, first=true));
             }
         });
+
+        let startSymbol = {
+            type: "simple-marker",
+            color: "green",
+            size: "10px"
+          };
+        
+        // let endSymbol = {
+        //     type: "simple-marker",
+        //     color: "red",
+        //     size: "10px"
+        // };
+
+        let endSymbol = {
+            type: "picture-marker",
+            url: locationPin, // location pin icon
+            width: "24px",
+            height: "24px",
+            color: "red",
+            yoffset: "12px" // Adjust to align the pin properly
+        };
+
+        // add points for start of each trip
+        trips.forEach((trip, i) => {
+            if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
+                lid=trip.sensor_data.longitude.length-1;
+                graphicsLayer.add(getTripEndPoint(Graphic, startSymbol, trip.sensor_data.longitude[0], trip.sensor_data.latitude[0]));
+                graphicsLayer.add(getTripEndPoint(Graphic, endSymbol, trip.sensor_data.longitude[lid], trip.sensor_data.latitude[lid]));
+            }
+        });
+
+        // find global MBR 
+        findGlobalMBR(trips);
 
         const view = new MapView({
             map: map,
@@ -158,17 +192,29 @@ function renderScooterTrips(trips) {
 
                 // Calculate and log the extent
                 const extent = geometry.extent;
-                // console.log('Extent:', extent);
+                // console.log('Extent:', extent); 
                 updateExtentInputs(extent);
             }
         });
 
         // Function to update extent input fields
         function updateExtentInputs(extent) {
-            document.getElementById('extent1').value = extent.xmin.toFixed(4);
-            document.getElementById('extent2').value = extent.ymin.toFixed(4);
-            document.getElementById('extent3').value = extent.xmax.toFixed(4);
-            document.getElementById('extent4').value = extent.ymax.toFixed(4);
+            // Convert min and max points to lat/lon
+            const minPoint = webMercatorUtils.xyToLngLat(extent.xmin, extent.ymin);
+            const maxPoint = webMercatorUtils.xyToLngLat(extent.xmax, extent.ymax);
+
+            // console.log(minPoint, maxPoint);
+
+            document.getElementById('extent1').value = minPoint[1];
+            document.getElementById('extent2').value = maxPoint[1];
+            document.getElementById('extent3').value = minPoint[0];
+            document.getElementById('extent4').value = maxPoint[0];
+
+            // open search box
+            var searchForm = document.getElementById('searchForm');
+            if (searchForm.style.display === 'none' || searchForm.style.display === '') {
+                searchForm.style.display = 'block'; 
+            }
         }
 
         // Show loading animation when the view is updating
@@ -207,39 +253,39 @@ function getGpsPath(gpsData, first) {
     if(valCount>gpsData.latitude.length)
         valCount=gpsData.latitude.length;
 
-    var minx=(gpsData.longitude[0]), miny=(gpsData.latitude[0]);
-    var maxx=(gpsData.longitude[0]), maxy=(gpsData.latitude[0]);
+    // var minx=(gpsData.longitude[0]), miny=(gpsData.latitude[0]);
+    // var maxx=(gpsData.longitude[0]), maxy=(gpsData.latitude[0]);
     for (let i = 0; i < valCount; i++) {
         gpsPath.push([gpsData.longitude[i], gpsData.latitude[i]]);
 
-        //remove in the production. This data will be provided from the API
-        if(minx>gpsPath[i][0])
-            minx=gpsPath[i][0];
-        if(miny>gpsPath[i][1])
-            miny=gpsPath[i][1];
-        if(maxx<gpsPath[i][0])
-            maxx=gpsPath[i][0];
-        if(maxy<gpsPath[i][1])
-            maxy=gpsPath[i][1];
+        // //remove in the production. This data will be provided from the API
+        // if(minx>gpsPath[i][0])
+        //     minx=gpsPath[i][0];
+        // if(miny>gpsPath[i][1])
+        //     miny=gpsPath[i][1];
+        // if(maxx<gpsPath[i][0])
+        //     maxx=gpsPath[i][0];
+        // if(maxy<gpsPath[i][1])
+        //     maxy=gpsPath[i][1];
     }
 
-    // if first entry
-    if(first){
-        gminx=minx;
-        gminy=miny;
-        gmaxx=maxx;
-        gmaxy=maxy;
-    }else{
-        if(gminx>minx)
-            gminx=minx;
-        if(gminy>miny)
-            gminy=miny;
-        if(gmaxx<maxx)
-            gmaxx=maxx;
-        if(gmaxy<maxy)
-            gmaxy=maxy;
-    }
-    first=false
+    // // if first entry
+    // if(first){
+    //     gminx=minx;
+    //     gminy=miny;
+    //     gmaxx=maxx;
+    //     gmaxy=maxy;
+    // }else{
+    //     if(gminx>minx)
+    //         gminx=minx;
+    //     if(gminy>miny)
+    //         gminy=miny;
+    //     if(gmaxx<maxx)
+    //         gmaxx=maxx;
+    //     if(gmaxy<maxy)
+    //         gmaxy=maxy;
+    // }
+    // first=false
     // console.log(gpsPath)
     return gpsPath;
 }
@@ -710,10 +756,59 @@ function parseDate(dateStr) {
 }
 
 // ------------------------------------------------------------------------------
+// Find global MBR of the trips
+// ------------------------------------------------------------------------------
+function findGlobalMBR(trips) {
+    gminx=trips[0].mbr.min_lon;
+    gminy=trips[0].mbr.min_lat;
+    gmaxx=trips[0].mbr.max_lon;
+    gmaxy=trips[0].mbr.max_lat;
+
+    // Add polylines for each trip to the polylineLayer
+    trips.forEach((trip, i) => {
+        if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
+            if(gminx>trip.mbr.min_lon)
+                gminx=trip.mbr.min_lon;
+            if(gminy>trip.mbr.min_lat)
+                gminy=trip.mbr.min_lat;
+            if(gmaxx<trip.mbr.max_lon)
+                gmaxx=trip.mbr.max_lon;
+            if(gmaxy<trip.mbr.max_lat)
+                gmaxy=trip.mbr.max_lat;
+        }
+        // console.log(trip.mbr.min_lon+" "+trip.mbr.min_lat+" "+trip.mbr.max_lon+" "+trip.mbr.max_lat);
+    });
+    // console.log(gminx+" "+gminy+" "+gmaxx+" "+gmaxy);
+}
+
+// ------------------------------------------------------------------------------
+// Loads a start or end point of a trip
+// ------------------------------------------------------------------------------
+function getTripEndPoint(Graphic, symbol, lon, lat) {
+    // Create graphics for end point
+    return endGraphic = new Graphic({
+        geometry: { type: "point", longitude: lon, latitude: lat },
+        symbol: symbol
+    });
+}
+
+// ------------------------------------------------------------------------------
 // Dynamically loads sensor data for a selected trip.
 // ------------------------------------------------------------------------------
 function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
-    let genColor = getHeatMapColor((tid)/(tripCount-1));  // Normalize by line index
+    // set trip trajectory color
+    let genColor = [
+        [128],
+        [230],
+        [230]   
+    ];
+    if (tripCount>1) {
+        genColor = getHeatMapColor((tid)/(tripCount-1));  // Normalize by line index
+    }
+
+    // set extent
+
+
     //a polyline graphic is created and added to the map.
     const polylineGraphic = new Graphic({
         geometry: {

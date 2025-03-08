@@ -708,8 +708,14 @@
 
   </div>
   <div id="logoDiv" class="esri-widget">
-    <img class="logo-img" src="{{ asset('ScooterLabLogo.png') }}" alt="Scooter Lab">
+    <img class="logo-img" src="{{ asset('img-icons/ScooterLabLogo.png') }}" alt="Scooter Lab">
     <div id="basemapGalleryDiv"></div>
+  </div>
+  
+  <div class="legend">
+    <div class="start-pin"></div> <p>Trip Start</p>
+    <img src="{{ asset('img-icons/location-pin.png') }}" alt="trip end"> <p>Trip End</p>
+  </div>
 
 
     <script src="https://d3js.org/d3.v7.min.js"></script> 
@@ -718,6 +724,7 @@
     <script src="https://js.arcgis.com/4.26/"></script>
     <script>
       var url = '{{ URL::asset('/fcapi') }}';
+      var locationPin = '{{ asset('img-icons/location-pin.png') }}';
     </script>
    
     <script type="text/javascript" src="{{ asset('js/map.js') }}"></script>

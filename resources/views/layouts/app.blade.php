@@ -51,11 +51,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
         <!-- for map tool  -->
-        <script>
+        <!-- <script>
             $(document).ready(function() {
                 $('select').selectpicker();
             });
-        </script>
+        </script> -->
 
     </head>
     <body class="font-sans antialiased">

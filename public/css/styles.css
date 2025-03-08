@@ -215,3 +215,30 @@ input[type="range"]:active::-webkit-slider-thumb{
         transform: rotate(360deg);
     }
 }
+
+.legend {
+    display: block;
+    position: fixed;
+    top: 94%;
+    background-color: #2b26261f;
+    border-radius: 10px;
+    padding: 5px 15px 5px 15px;
+    margin-left: 10px;
+}
+.legend p {
+    display: inline;
+}
+
+.legend img {
+    width: 30px;
+    display: inline;
+}
+
+.start-pin {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-color: #008000;
+    border: solid 2px #000000;
+    border-radius: 50%;
+}
