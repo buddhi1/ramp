@@ -288,4 +288,26 @@ class ProjectController extends Controller
         $project->delete();
         return redirect()->route('projects.index');
     }
+
+    // retrive project info for the dashboard
+    public function projectSummary()
+    {
+        $user = Auth::user();
+
+        if ($user->isAdmin()) {
+            $projects = Project::all();
+        } else {
+            // only fetch the projects belong to the current user
+            $projects = Project::where('owner_id', $user->id)->get();
+        }
+
+        foreach ($projects as $project) {
+            $project->attributes = DataPolicy::where('project_id', $project->id)
+            ->join('attributes', 'data_policies.data_attr_id', '=', 'attributes.id')
+            ->select('attributes.name', 'attributes.id')
+            ->get();
+        }
+
+        return view('dashboard', compact('projects'));
+    }
 }

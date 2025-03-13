@@ -9,6 +9,8 @@ html, body, #viewDiv {
     width: 100%; */
     height: calc(100% - 23px);
     width: calc(100% - 86px);
+    /* height: calc(100% - 67px);
+    width: calc(100% - 258px); */
     position: absolute;
 }
 
@@ -241,4 +243,25 @@ input[type="range"]:active::-webkit-slider-thumb{
     background-color: #008000;
     border: solid 2px #000000;
     border-radius: 50%;
+}
+
+.main-container {
+    background-color: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.custom-box {
+    height: 400px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.width-all {
+    width: 100%;
+    position: fixed;
 }

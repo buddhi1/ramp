@@ -29,9 +29,13 @@ Route::get('/', function () {
 });
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'attachrole', '2fa'])->name('dashboard');
+// Route::get('/dashboard', function () {
+
+//     return view('dashboard');
+// })->middleware(['auth', 'verified', 'attachrole', '2fa'])->name('dashboard');
+Route::middleware(['auth', 'verified', 'attachrole', '2fa'])->group(function () {
+    Route::get('/dashboard', [ProjectController::class, 'projectSummary'])->name('dashboard');
+});
 
 Route::middleware(['auth', 'attachrole'])->group(function () {
     Route::get('/profile/verify2fa', [ProfileController::class, 'show2FAVerifyForm'])->name('profile.show2FAVerifyForm');

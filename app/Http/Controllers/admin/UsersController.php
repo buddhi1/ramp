@@ -21,7 +21,9 @@ class UsersController extends Controller
 
         // Fetch projects belonging to the current user
         $users = User::with('roles')->get();
-        return view('users.index', compact('users'));
+        $projects = Project::select('id', 'name')->get();
+
+        return view('users.index', compact('users', 'projects'));
     }
 
     public function create()
