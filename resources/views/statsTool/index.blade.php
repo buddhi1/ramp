@@ -153,6 +153,7 @@
 
                 {{-- 1) 'url' variable for fetch(url + '/tripsGPS') (or /trips) --}}
                 <script>
+                    var url = '{{ URL::asset('/fcapi') }}'; 
                     // var url = 'http://172.20.215.102:8008/fcapi-open';
                 </script>
 

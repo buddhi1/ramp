@@ -92,6 +92,7 @@ function populateScooterDropdown(data) {
 }
 
 const sensorOptions = [
+  { label: 'All Sensors',    value: 'all' },
   { label: 'Acceleration',   value: 'accel' },
   { label: 'Gyroscope',      value: 'gyro' },
   { label: 'Magnetometer',   value: 'mag' },
@@ -101,7 +102,6 @@ const sensorOptions = [
   { label: 'Temperature',    value: 'temperature' },
   { label: 'Pressure',       value: 'pressure' },
   { label: 'Humidity',       value: 'humidity' },
-  { label: 'All Sensors',    value: 'all' },
 ];
 
 function populateSensorDropdown() {
@@ -153,8 +153,8 @@ function createTable(data) {
   const headerRow = thead.append("tr");
 
   // HEADERS (only those that are "true")
-  // S. No always included:
-  headerRow.append("th").text("S. No.");
+  // No always included:
+  headerRow.append("th").text("No.");
   if (columnVisibility.tripIdCol) {
     headerRow.append("th").text("Trip ID");
   }
