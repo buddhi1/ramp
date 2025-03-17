@@ -294,12 +294,12 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isAdmin()) {
+        // if ($user->isAdmin()) {
             $projects = Project::all();
-        } else {
-            // only fetch the projects belong to the current user
-            $projects = Project::where('owner_id', $user->id)->get();
-        }
+        // } else {
+        //     // only fetch the projects belong to the current user
+        //     $projects = Project::where('owner_id', $user->id)->get();
+        // }
 
         foreach ($projects as $project) {
             $project->attributes = DataPolicy::where('project_id', $project->id)
