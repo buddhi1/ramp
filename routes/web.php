@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\InterfcapiController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\ProjectdailysummaryController;
 
 use Illuminate\Http\Request;
 
@@ -28,6 +29,7 @@ Route::get('/', function () {
     return view('auth/login');
 });
 
+Route::apiResource('projectDailySummary', ProjectdailysummaryController::class);
 
 // Route::get('/dashboard', function () {
 
@@ -62,8 +64,6 @@ Route::middleware(['auth', 'attachrole', '2fa'])->group(function () {
     });
 });
 
-
-
 //map tool view
 Route::middleware('auth')->group(function () {
     Route::get('/mapTool', function () {
@@ -96,6 +96,8 @@ Route::middleware('auth')->group(function () {
         abort(404); // Method not found
     });
 });
+
+
 
 // Route::get('fcapi/initData', function () {
 //     $response = Http::get('192.168.214.103:5000/initData');

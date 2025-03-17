@@ -54,11 +54,11 @@
             </div>
         </div>
 
-        <div class="row d-flex justify-content-between">
+        <!-- <div class="row d-flex justify-content-between">
             <div class="col-md-6 col-lg-4 custom-box">Plot: Distance completed per day</div>
             <div class="col-md-6 col-lg-4 custom-box">Plot: Trip count per day</div>
             <div class="col-md-12 col-lg-4 custom-box">Plot: </div>
-        </div>
+        </div> -->
         <div class="d-flex justify-content-center mt-3">
             <a href="/mapTool"><button class="btn text-dark me-2" style="background-color: #FFD700;">Map Tool</button></a>
             <a href="/statsTool"><button class="btn text-dark" style="background-color:rgb(0, 183, 255);">Stats Tool</button></a>

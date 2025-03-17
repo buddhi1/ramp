@@ -322,9 +322,9 @@ function getScooterTripInfo(trip) {
         Start_time: new Date(trip.start_time).toLocaleTimeString(),
         End_time: new Date(trip.end_time).toLocaleTimeString(),
         Trip_distance: trip.distance + " mi",
-        Average_speed: trip.avg_speed + " kmph",
-        Max_speed: trip.max_speed + " kmph",
-        Min_speed: trip.min_speed + " kmph",
+        Average_speed: trip.avg_speed + " km/h",
+        Max_speed: trip.max_speed + " km/h",
+        Min_speed: trip.min_speed + " km/h",
         Start_battery_status: trip.start_battery_status + " %",
         End_battery_status: trip.end_battery_status + " %",
         Stops: trip.stops,
@@ -851,8 +851,8 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
                     <p><strong>Average Speed:</strong> ${data[0].avg_speed} kmph</p>
                     <p><strong>Max Speed:</strong> ${data[0].max_speed} kmph</p>
                     <p><strong>Min Speed:</strong> ${data[0].min_speed} kmph</p>
-                    <p><strong>Start Battery:</strong> ${data[0].start_battery} W</p>
-                    <p><strong>End Battery:</strong> ${data[0].end_battery} W</p>
+                    <p><strong>Battery at the start:</strong> ${data[0].start_battery_status}%</p>
+                    <p><strong>Battery st the end:</strong> ${data[0].end_battery_status}%</p>
                     `;
                 // Append the text content (above charts)
                 const textDiv = document.createElement('div');

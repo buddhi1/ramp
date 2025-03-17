@@ -110,8 +110,8 @@
 
                             <!-- Buttons row -->
                             <div style="margin-bottom: 20px;">
-                                <button id="plotButton">Plot</button>
-                                <button id="downloadChartsButton" style="margin-left: 10px;">Download Charts</button>
+                                <button class="tab-plot" id="plotButton">Plot</button>
+                                <button class="tab-plot" id="downloadChartsButton" style="margin-left: 10px;">Download Charts</button>
                             </div>
 
                             <!-- The D3 charts get appended into #chart-container -->

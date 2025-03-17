@@ -33,12 +33,16 @@ class InterfcapiController extends Controller
     }
 
     // method to retrieve trips with all sensor data
-    public function trips(){
+    public function trips(Request $request){
         $user = Auth::user();
         if($user){
             // use the following to check if the user has a certain role. Ex. admin
             // $isAdmin = $user->hasRole('ADMIN');
-            $response = Http::get($this->url.'/trips');
+            if($request->start_time && $request->end_time){
+                $response = Http::get($this->url.'/trips?start_time='.$request->start_time.'&end_time='.$request->end_time);
+            }else {
+                $response = Http::get($this->url.'/trips');
+            }
             return $response;
         }
         // not found. Has not access to the trips

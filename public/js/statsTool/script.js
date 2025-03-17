@@ -60,7 +60,9 @@ function hideLoading() {
 /** 1) Fetch data from your FC API endpoint (or local JSON if you prefer) */
 function loadData() {
   showLoading();
-  fetch(url + '/trips') // or '/tripsGPS' depending on your server
+  // fetch(url + '/trips') // or '/tripsGPS' depending on your server
+  // fetch(url + '/trips?start_time=2025-02-12T08:00:00&end_time=2025-03-15T22:59:00') // ***** testing only *****
+  fetch(url + '/tripsGPS') // ***** testing only *****
     .then(res => res.json())
     .then(data => {
       tripsData = data;
@@ -154,7 +156,7 @@ function createTable(data) {
 
   // HEADERS (only those that are "true")
   // No always included:
-  headerRow.append("th").text("No.");
+  headerRow.append("th").text("#");
   if (columnVisibility.tripIdCol) {
     headerRow.append("th").text("Trip ID");
   }
@@ -171,19 +173,19 @@ function createTable(data) {
     headerRow.append("th").text("Trip Distance");
   }
   if (columnVisibility.avgSpeedCol) {
-    headerRow.append("th").text("Avg Speed");
+    headerRow.append("th").text("Avg Speed (km/h)");
   }
   if (columnVisibility.maxSpeedCol) {
-    headerRow.append("th").text("Max Speed");
+    headerRow.append("th").text("Max Speed (km/h)");
   }
   if (columnVisibility.minSpeedCol) {
-    headerRow.append("th").text("Min Speed");
+    headerRow.append("th").text("Min Speed (km/h)");
   }
   if (columnVisibility.batteryStartCol) {
-    headerRow.append("th").text("Battery Start");
+    headerRow.append("th").text("Battery % at trip start");
   }
   if (columnVisibility.batteryEndCol) {
-    headerRow.append("th").text("Battery End");
+    headerRow.append("th").text("Battery % at trip end");
   }
 
   // If sensorDataDisplayed => only then do we consider sensor columns
@@ -529,56 +531,66 @@ function plotRequestedData() {
   const sTrip    = tripIdSelect.value;
   const sSensor  = sensorSelect.value;
 
-  let filtered = tripsData.filter(d=> d.scooter_id===sScooter);
-  filtered     = filtered.filter(d=> d.trip_id===sTrip);
-  if (filtered.length===0) {
-    alert("No matching data for those selections.");
-    return;
-  }
+  // let filtered = tripsData.filter(d=> d.scooter_id===sScooter);
+  // filtered     = filtered.filter(d=> d.trip_id===sTrip);
+  // if (filtered.length===0) {
+  //   alert("No matching data for those selections.");
+  //   return;
+  // }
 
-  filtered.forEach(trip => {
-    switch(sSensor) {
-      case "accel":
-        createMultiLineChart(trip, ACC_FIELDS, `Trip ${trip.trip_id} - Acceleration (X,Y,Z)`);
-        break;
-      case "gyro":
-        createMultiLineChart(trip, GYR_FIELDS, `Trip ${trip.trip_id} - Gyroscope (X,Y,Z)`);
-        break;
-      case "mag":
-        createMultiLineChart(trip, MAG_FIELDS, `Trip ${trip.trip_id} - Magnetometer (X,Y,Z)`);
-        break;
-      case "orient":
-        createMultiLineChart(trip, ORI_FIELDS, `Trip ${trip.trip_id} - Orientation (Pitch,Roll,Yaw)`);
-        break;
-      case "latitude":
-        createMultiLineChart(trip, ["latitude"], `Trip ${trip.trip_id} - Latitude`);
-        break;
-      case "longitude":
-        createMultiLineChart(trip, ["longitude"], `Trip ${trip.trip_id} - Longitude`);
-        break;
-      case "temperature":
-        createMultiLineChart(trip, ["temperature"], `Trip ${trip.trip_id} - Temperature`);
-        break;
-      case "pressure":
-        createMultiLineChart(trip, ["pressure"], `Trip ${trip.trip_id} - Pressure`);
-        break;
-      case "humidity":
-        createMultiLineChart(trip, ["humidity"], `Trip ${trip.trip_id} - Humidity`);
-        break;
-      case "all":
-        createMultiLineChart(trip, ACC_FIELDS,    `Trip ${trip.trip_id} - Acceleration`);
-        createMultiLineChart(trip, GYR_FIELDS,    `Trip ${trip.trip_id} - Gyroscope`);
-        createMultiLineChart(trip, MAG_FIELDS,    `Trip ${trip.trip_id} - Magnetometer`);
-        createMultiLineChart(trip, ORI_FIELDS,    `Trip ${trip.trip_id} - Orientation`);
-        createMultiLineChart(trip, ["latitude"],  `Trip ${trip.trip_id} - Latitude`);
-        createMultiLineChart(trip, ["longitude"], `Trip ${trip.trip_id} - Longitude`);
-        createMultiLineChart(trip, ["temperature"], `Trip ${trip.trip_id} - Temperature`);
-        createMultiLineChart(trip, ["pressure"],    `Trip ${trip.trip_id} - Pressure`);
-        createMultiLineChart(trip, ["humidity"],    `Trip ${trip.trip_id} - Humidity`);
-        break;
-      default:
-        createMultiLineChart(trip, [sSensor], `Trip ${trip.trip_id} - ${sSensor}`);
-    }
+  return fetch(url+'/tripData?id='+sTrip)
+  .then(response => response.json())
+  .then(data => {
+    
+    trip=data[0];
+    // filtered.forEach(trip => {
+      switch(sSensor) {
+        case "accel":
+          createMultiLineChart(trip, ACC_FIELDS, `Trip ${trip.trip_id} - Acceleration (X,Y,Z)`);
+          break;
+        case "gyro":
+          createMultiLineChart(trip, GYR_FIELDS, `Trip ${trip.trip_id} - Gyroscope (X,Y,Z)`);
+          break;
+        case "mag":
+          createMultiLineChart(trip, MAG_FIELDS, `Trip ${trip.trip_id} - Magnetometer (X,Y,Z)`);
+          break;
+        case "orient":
+          createMultiLineChart(trip, ORI_FIELDS, `Trip ${trip.trip_id} - Orientation (Pitch,Roll,Yaw)`);
+          break;
+        case "latitude":
+          createMultiLineChart(trip, ["latitude"], `Trip ${trip.trip_id} - Latitude`);
+          break;
+        case "longitude":
+          createMultiLineChart(trip, ["longitude"], `Trip ${trip.trip_id} - Longitude`);
+          break;
+        case "temperature":
+          createMultiLineChart(trip, ["temperature"], `Trip ${trip.trip_id} - Temperature`);
+          break;
+        case "pressure":
+          createMultiLineChart(trip, ["pressure"], `Trip ${trip.trip_id} - Pressure`);
+          break;
+        case "humidity":
+          createMultiLineChart(trip, ["humidity"], `Trip ${trip.trip_id} - Humidity`);
+          break;
+        case "all":
+          createMultiLineChart(trip, ACC_FIELDS,    `Trip ${trip.trip_id} - Acceleration`);
+          createMultiLineChart(trip, GYR_FIELDS,    `Trip ${trip.trip_id} - Gyroscope`);
+          createMultiLineChart(trip, MAG_FIELDS,    `Trip ${trip.trip_id} - Magnetometer`);
+          createMultiLineChart(trip, ORI_FIELDS,    `Trip ${trip.trip_id} - Orientation`);
+          createMultiLineChart(trip, ["latitude"],  `Trip ${trip.trip_id} - Latitude`);
+          createMultiLineChart(trip, ["longitude"], `Trip ${trip.trip_id} - Longitude`);
+          createMultiLineChart(trip, ["temperature"], `Trip ${trip.trip_id} - Temperature`);
+          createMultiLineChart(trip, ["pressure"],    `Trip ${trip.trip_id} - Pressure`);
+          createMultiLineChart(trip, ["humidity"],    `Trip ${trip.trip_id} - Humidity`);
+          break;
+        default:
+          createMultiLineChart(trip, [sSensor], `Trip ${trip.trip_id} - ${sSensor}`);
+      }
+    // });
+  })
+  .catch(err => {
+      console.error("Error fetching trip data:", err);
+      return "Failed to load trip data.";
   });
 }
 
