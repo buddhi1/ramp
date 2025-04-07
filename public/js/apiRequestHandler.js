@@ -11,13 +11,13 @@
 // returns the JSON initial data bump
 // This data are used to populate the search box sliders and text boxes
 // ----------------------------------------------------------------------------------
-document.addEventListener("DOMContentLoaded", function () {
+//document.addEventListener("DOMContentLoaded", function () {
   // Fetch initial data from the API
-  fetch(url+'/initData')
-    .then((response) => response.json())
-    .catch((error) => console.error("Error fetching initial data:", error));
+  //fetch(url+'/initData')
+    //.then((response) => response.json())
+  //  .catch((error) => console.error("Error fetching initial data:", error));
 
-});
+//});
 
 // ----------------------------------------------------------------------------------
 // Search box submit button functinality
