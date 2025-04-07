@@ -1,4 +1,4 @@
-
+// public/js/statsTool/script.js
 
 let tripsData = [];
 
@@ -60,9 +60,7 @@ function hideLoading() {
 /** 1) Fetch data from your FC API endpoint (or local JSON if you prefer) */
 function loadData() {
   showLoading();
-  // fetch(url + '/trips') // or '/tripsGPS' depending on your server
-  // fetch(url + '/trips?start_time=2025-02-12T08:00:00&end_time=2025-03-15T22:59:00') // ***** testing only *****
-  fetch(url + '/tripsGPS') // ***** testing only *****
+  fetch(url + '/tripsGPS') // or '/tripsGPS' depending on your server
     .then(res => res.json())
     .then(data => {
       tripsData = data;
@@ -135,6 +133,7 @@ function handleScooterChange() {
 
 /** 
  * 4) Build Table with relevant columns shown or hidden based on our columnVisibility object.
+ *    Also add drag-and-drop code for columns after building the <thead>.
  */
 function createTable(data) {
   tableContainer.selectAll("*").remove();
@@ -235,6 +234,7 @@ function createTable(data) {
       row.append("td").text(trip.end_time);
     }
     if (columnVisibility.tripDistanceCol) {
+      // older field name was .distance or .trip_distance
       row.append("td").text(trip.distance);
     }
     if (columnVisibility.avgSpeedCol) {
@@ -285,6 +285,9 @@ function createTable(data) {
       }
     }
   });
+
+  // 4(a). **Add our drag/drop column code** right after building thead
+  addDragAndDropToColumns(table);
 
   // PAGINATION controls
   const paginationDiv = tableContainer.append("div")
@@ -350,6 +353,69 @@ function createTable(data) {
         });
     }
   }
+}
+
+/** Helper to make columns draggable by their <th> elements */
+function addDragAndDropToColumns(d3Table) {
+  const tableEl = d3Table.node();
+  if (!tableEl) return;
+
+  const headerRow = tableEl.querySelector("thead tr");
+  if (!headerRow) return;
+
+  // The TH elements
+  const thElems = Array.from(headerRow.children);
+
+  // We'll store the index of the column being dragged
+  let dragSrcIndex = null;
+
+  // Add event listeners to each TH
+  thElems.forEach((th, idx) => {
+    th.draggable = true;  
+    // store initial index in dataset
+    th.dataset.colIndex = idx;
+
+    th.addEventListener('dragstart', function(e) {
+      dragSrcIndex = +this.dataset.colIndex;
+      // optionally we can set some effectAllowed
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    th.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+
+    th.addEventListener('drop', function(e) {
+      e.preventDefault();
+      const targetIndex = +this.dataset.colIndex;
+      if (dragSrcIndex === targetIndex) return;
+      reorderTableColumns(tableEl, dragSrcIndex, targetIndex);
+    });
+  });
+}
+
+/** Actually reorder the columns in the table’s DOM (both <thead> and <tbody> rows) */
+function reorderTableColumns(tableEl, fromIndex, toIndex) {
+  const rows = tableEl.querySelectorAll("tr");
+  rows.forEach(row => {
+    // row.children is a live HTMLCollection
+    const cells = Array.from(row.children);
+    const movedCell = cells[fromIndex];
+    // If dragging left or right we do slightly different insert logic
+    if (fromIndex < toIndex) {
+      row.insertBefore(movedCell, cells[toIndex+1] || null);
+    } else {
+      row.insertBefore(movedCell, cells[toIndex]);
+    }
+  });
+
+  // update the dataset.colIndex on each TH so subsequent drags are aware
+  const headerRow = tableEl.querySelector("thead tr");
+  const newThs = Array.from(headerRow.children);
+  newThs.forEach((th, newIdx) => {
+    th.dataset.colIndex = newIdx;
+  });
 }
 
 /** Build {x,y,z} array as JSON string for columns like accelerometer, gyro, magnetometer */
@@ -515,7 +581,7 @@ function createMultiLineChart(trip, fields, titleText) {
     brushG.call(brush.move, null);
   }
 
-  // double-click reset with small animation
+  // double-click reset
   svg.on("dblclick", function(){
     x.domain(d3.extent(allValues, d=>d.timeInSec));
     xAxis.transition().duration(500).call(d3.axisBottom(x).ticks(5));
@@ -606,27 +672,24 @@ function renderScooterStats() {
   grouped.forEach((arr, scooterId) => {
     const tripCount = arr.length;
     let totalDistance=0, totalSpeed=0, maxSpeed=0, totalDuration=0;
-    let totalStops=0;  // to track # of stops across all trips
+    let totalStops=0;  
     let totalBatteryUsed=0;
 
     arr.forEach(d => {
-      const dist= parseFloat(d.trip_distance)||0;
+      const dist= parseFloat(d.trip_distance)||parseFloat(d.distance)||0;
       totalDistance+=dist;
       const spd= parseFloat(d.avg_speed)||0;
       totalSpeed+=spd;
       const ms= parseFloat(d.max_speed)||0;
       if(ms>maxSpeed) maxSpeed=ms;
 
-      // Duration
       const st=new Date(d.start_time);
       const et=new Date(d.end_time);
-      totalDuration+=(et-st)/60000; // min
+      totalDuration+=(et-st)/60000; 
 
-      // stops
       const s = parseInt(d.stops)||0;
       totalStops+= s;
 
-      // battery
       const bStart = parseFloat(d.start_battery_status)||0;
       const bEnd   = parseFloat(d.end_battery_status)||0;
       const used   = bStart - bEnd; 
@@ -770,7 +833,7 @@ function renderScooterStats() {
     .enter().append("rect")
       .attr("class","bar2")
       .attr("x", d=>xScale(d.scooterId))
-      .attr("y", d=> yScale2(+d.totalDistance))
+      .attr("y", d=>yScale2(+d.totalDistance))
       .attr("width", xScale.bandwidth())
       .attr("height", d=> barH - yScale2(+d.totalDistance))
       .attr("fill","darkorange");
@@ -824,8 +887,6 @@ function renderScooterStats() {
     .attr("text-anchor","middle")
     .attr("transform", `rotate(-90) translate(${-barH/2}, -40)`)
     .text("Avg Battery Used");
-
- 
 
   //-----------
   // CHART #5: Bar chart of avg Duration
@@ -881,7 +942,7 @@ function renderProjectSummary() {
   let sumBatteryUsed=0, sumStops=0;
 
   tripsData.forEach(d => {
-    const dist= parseFloat(d.trip_distance)||0;
+    const dist= parseFloat(d.trip_distance)||parseFloat(d.distance)||0;
     sumDistance+=dist;
     const spd= parseFloat(d.avg_speed)||0;
     sumSpeed+=spd;
@@ -893,11 +954,9 @@ function renderProjectSummary() {
     const et=new Date(d.end_time);
     sumDuration+=(et-st)/60000; // in minutes
 
-    // stops
     const s= parseInt(d.stops)||0;
     sumStops+=s;
 
-    // battery used
     const bStart= parseFloat(d.start_battery_status)||0;
     const bEnd  = parseFloat(d.end_battery_status)||0;
     const used  = bStart - bEnd;
@@ -916,7 +975,7 @@ function renderProjectSummary() {
   container.append("p").text(`Avg Speed across dataset: ${avgSpeed.toFixed(2)}`);
   container.append("p").text(`Avg Trip Duration (min): ${avgDuration}`);
   container.append("p").text(`Avg Stops: ${avgStops}`);
-  container.append("p").text(`Avg Battery Used: ${avgBatteryUsed.toFixed(2)}`);
+  container.append("p").text(`Avg Battery Used: ${avgBatteryUsed}`);
 
   // We can build a small dataset to bar-plot these summary stats
   const summaryData = [
@@ -1049,7 +1108,6 @@ function renderProjectSummary() {
 
   const g4 = svg4.append("g")
     .attr("transform", `translate(${margin.left},${margin.top})`);
-  // We'll just do 2 points in a line: (0,0) -> (totalTrips, totalDistance)
   const lineData = [
     { x:0, y:0 },
     { x: totalTrips, y: sumDistance },
@@ -1111,8 +1169,7 @@ function renderProjectSummary() {
     .attr("transform", `translate(0,${h})`)
     .call(d3.axisBottom(x5).ticks(5));
   // y-axis
-  g5.append("g")
-    .call(d3.axisLeft(y5).ticks(5));
+  g5.append("g").call(d3.axisLeft(y5).ticks(5));
 
   g5.selectAll(".barHist")
     .data(bins)
@@ -1130,13 +1187,11 @@ function renderProjectSummary() {
     .attr("text-anchor","middle")
     .style("font-size","12px")
     .text("Histogram of Avg Speeds");
-
-
 }
 
-/*****************************************************************
- * COLUMN CHECKBOX LOGIC
- ****************************************************************/
+//--------------------------------------------------------------------------
+// COLUMN CHECKBOX LOGIC
+//--------------------------------------------------------------------------
 const mainColumnToggles    = document.querySelectorAll(".col-toggle");
 const sensorDataSelect     = document.getElementById("sensorDataDisplaySelect");
 const sensorColumnToggles  = document.querySelectorAll(".sensor-col-toggle");

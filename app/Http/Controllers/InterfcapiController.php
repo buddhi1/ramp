@@ -17,8 +17,11 @@ class InterfcapiController extends Controller
     public function __construct()
     {
         // initialize the FC local IP and the port
-        // $this->url = '192.168.214.102:5000'; //production FC
-        $this->url = '192.168.214.103:5001'; //testing FC
+        if (config('app.env') === 'production') {
+            $this->url = '192.168.214.103:5001'; //production FC
+        } else {
+            $this->url = '192.168.214.103:5001'; //testing FC
+        }
     }
 
     // method to retrieve initial data dump
