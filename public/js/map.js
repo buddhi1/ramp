@@ -831,28 +831,29 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
             .then(response => response.json())
             .then(data => {
                 // console.log(data[0])
-                timeDiffSeconds=(parseDate(data[0].end_time)-parseDate(data[0].start_time))/1000
+                // data=data[0]; // for single trip data
+                timeDiffSeconds=(parseDate(data.end_time)-parseDate(data.start_time))/1000
                 // console.log(timeDiffSeconds)
 
-                const chartAcc = renderLineChart([data[0].sensor_data.acc_x, data[0].sensor_data.acc_y, data[0].sensor_data.acc_z], ['x', 'y', 'z'],  (data[0].sensor_data.acc_x.length/timeDiffSeconds), 's', 'Accelerometer', 'Amplitude', 'Time (s)');
-                const chartGyro = renderLineChart([data[0].sensor_data.gyro_x, data[0].sensor_data.gyro_y, data[0].sensor_data.gyro_z], ['x', 'y', 'z'],  (data[0].sensor_data.gyro_x.length/timeDiffSeconds), 's', 'Gyroscope', 'Amplitude', 'Time (s)');
-                const chartMag = renderLineChart([data[0].sensor_data.mag_x, data[0].sensor_data.mag_y, data[0].sensor_data.mag_z], ['x', 'y', 'z'],  (data[0].sensor_data.mag_x.length/timeDiffSeconds), 's', 'Magnetometer', 'Amplitude', 'Amplitude (s)');
-                const chartOri = renderLineChart([data[0].sensor_data.pitch, data[0].sensor_data.roll, data[0].sensor_data.yaw], ['pitch', 'roll', 'yaw'],  (data[0].sensor_data.pitch.length/timeDiffSeconds), 's', 'Orientation', 'Amplitude', 'Time (s)');
-                const chartAlt = renderLineChart([data[0].sensor_data.altitude], ['x'],  (data[0].sensor_data.altitude.length/timeDiffSeconds), 's', 'Altitude', 'Altitude', 'Time (s)');
-                const chartHumi = renderLineChart([data[0].sensor_data.humidity], ['x'],  (data[0].sensor_data.humidity.length/timeDiffSeconds), 's', 'Humidity', 'Humidity', 'Time (s)');
-                const chartPress = renderLineChart([data[0].sensor_data.pressure], ['x'],  (data[0].sensor_data.pressure.length/timeDiffSeconds), 's', 'Pressure', 'Pressure', 'Time (s)');
-                const chartTemp = renderLineChart([data[0].sensor_data.temperature], ['x'],  (data[0].sensor_data.temperature.length/timeDiffSeconds), 's', 'Temperature', 'Temperature', 'Time (s)');
+                const chartAcc = renderLineChart([data.sensor_data.acc_x, data.sensor_data.acc_y, data.sensor_data.acc_z], ['x', 'y', 'z'],  (data.sensor_data.acc_x.length/timeDiffSeconds), 's', 'Accelerometer', 'Amplitude', 'Time (s)');
+                const chartGyro = renderLineChart([data.sensor_data.gyro_x, data.sensor_data.gyro_y, data.sensor_data.gyro_z], ['x', 'y', 'z'],  (data.sensor_data.gyro_x.length/timeDiffSeconds), 's', 'Gyroscope', 'Amplitude', 'Time (s)');
+                const chartMag = renderLineChart([data.sensor_data.mag_x, data.sensor_data.mag_y, data.sensor_data.mag_z], ['x', 'y', 'z'],  (data.sensor_data.mag_x.length/timeDiffSeconds), 's', 'Magnetometer', 'Amplitude', 'Amplitude (s)');
+                const chartOri = renderLineChart([data.sensor_data.pitch, data.sensor_data.roll, data.sensor_data.yaw], ['pitch', 'roll', 'yaw'],  (data.sensor_data.pitch.length/timeDiffSeconds), 's', 'Orientation', 'Amplitude', 'Time (s)');
+                const chartAlt = renderLineChart([data.sensor_data.altitude], ['x'],  (data.sensor_data.altitude.length/timeDiffSeconds), 's', 'Altitude', 'Altitude', 'Time (s)');
+                const chartHumi = renderLineChart([data.sensor_data.humidity], ['x'],  (data.sensor_data.humidity.length/timeDiffSeconds), 's', 'Humidity', 'Humidity', 'Time (s)');
+                const chartPress = renderLineChart([data.sensor_data.pressure], ['x'],  (data.sensor_data.pressure.length/timeDiffSeconds), 's', 'Pressure', 'Pressure', 'Time (s)');
+                const chartTemp = renderLineChart([data.sensor_data.temperature], ['x'],  (data.sensor_data.temperature.length/timeDiffSeconds), 's', 'Temperature', 'Temperature', 'Time (s)');
 
-                const textContent = `<h5>Trip ${tripID} (Scooter ${data[0].scooter_id})</h5>
-                    <p><strong>Start Date:</strong> ${data[0].start_time}</p>
-                    <p><strong>End Date:</strong> ${data[0].end_time}</p>
+                const textContent = `<h5>Trip ${tripID} (Scooter ${data.scooter_id})</h5>
+                    <p><strong>Start Date:</strong> ${data.start_time}</p>
+                    <p><strong>End Date:</strong> ${data.end_time}</p>
                     <p><strong>Trip Duration:</strong> ${Math.floor(timeDiffSeconds/60*10)/10} minutes</p>
-                    <p><strong>Distance:</strong> ${data[0].distance} km</p>
-                    <p><strong>Average Speed:</strong> ${data[0].avg_speed} kmph</p>
-                    <p><strong>Max Speed:</strong> ${data[0].max_speed} kmph</p>
-                    <p><strong>Min Speed:</strong> ${data[0].min_speed} kmph</p>
-                    <p><strong>Battery at the start:</strong> ${data[0].start_battery_status}%</p>
-                    <p><strong>Battery st the end:</strong> ${data[0].end_battery_status}%</p>
+                    <p><strong>Distance:</strong> ${data.distance} km</p>
+                    <p><strong>Average Speed:</strong> ${data.avg_speed} kmph</p>
+                    <p><strong>Max Speed:</strong> ${data.max_speed} kmph</p>
+                    <p><strong>Min Speed:</strong> ${data.min_speed} kmph</p>
+                    <p><strong>Battery at the start:</strong> ${data.start_battery_status}%</p>
+                    <p><strong>Battery st the end:</strong> ${data.end_battery_status}%</p>
                     `;
                 // Append the text content (above charts)
                 const textDiv = document.createElement('div');

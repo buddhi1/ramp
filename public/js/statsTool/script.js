@@ -542,7 +542,7 @@ function plotRequestedData() {
   .then(response => response.json())
   .then(data => {
     
-    trip=data[0];
+    trip=data;
     // filtered.forEach(trip => {
       switch(sSensor) {
         case "accel":
