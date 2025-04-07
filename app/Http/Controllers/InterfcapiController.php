@@ -17,7 +17,7 @@ class InterfcapiController extends Controller
     public function __construct()
     {
         // initialize the FC local IP and the port
-        $this->url = '192.168.214.103:5000';
+        $this->url = '192.168.214.103:5001';
     }
 
     // method to retrieve initial data dump
