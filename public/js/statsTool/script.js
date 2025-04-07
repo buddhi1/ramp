@@ -604,7 +604,7 @@ function plotRequestedData() {
   //   return;
   // }
 
-  return fetch(url+'/tripData?id='+sTrip)
+  return fetch(url+'/tripData?trip_id='+sTrip)
   .then(response => response.json())
   .then(data => {
     
