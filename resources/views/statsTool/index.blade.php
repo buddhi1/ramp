@@ -153,7 +153,7 @@
 
                 {{-- 1) 'url' variable for fetch(url + '/tripsGPS') (or /trips) --}}
                 <script>
-                    // var url = 'http://172.20.215.102:8008/fcapi-open';
+                     //var url = 'http://172.20.215.102:8008/fcapi-open';
                 </script>
 
                 {{-- 2) Load D3 & your custom logic (pagination, multi-line charts, toggling, etc.) --}}
