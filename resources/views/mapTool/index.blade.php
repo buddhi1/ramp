@@ -89,8 +89,17 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://js.arcgis.com/4.26/"></script>
   <script>
-    var url = "http://172.20.215.102:8008/fcapi-open";
-    var locationPin = '{{ asset('img-icons/location-pin.png') }}';
+    var app_env = "{{config('app.env')}}"
+    
+    if(app_env === 'test-vm' || app_env === 'production') {
+      // For production or test-vm, use the external fcapi endpoint
+      var url = '{{ URL::asset('/fcapi') }}';
+    } else {
+      // For local or dev environment, use the local fcapi
+      var url = "http://172.20.215.102:8008/fcapi-open";
+    }
+
+    var locationPin = "{{ asset('img-icons/location-pin.png') }}";
   </script>
   <script type="text/javascript" src="{{ asset('js/formGenerators.js') }}"></script>
   <script type="text/javascript" src="{{ asset('js/apiData.js') }}"></script>

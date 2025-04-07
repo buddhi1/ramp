@@ -91,6 +91,8 @@ document.getElementById("searchboxForm").addEventListener("submit", function (ev
         if(data.length<=0){
           loadingDiv.style.display = "none";
           alert('No trips found');
+        } else {
+          alert(data.length+' trips found'); // Alert the number of trips found
         }
         renderScooterTrips(data); // Call the method to render the trips on the map
       })

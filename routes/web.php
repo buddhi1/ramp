@@ -13,7 +13,6 @@ use App\Http\Controllers\ProjectdailysummaryController;
 
 use Illuminate\Http\Request;
 
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -98,34 +97,35 @@ Route::middleware('auth')->group(function () {
 });
 
 
+if (config('app.env') === 'test-vm') {
+    // Route::get('fcapi/initData', function () {
+    //     $response = Http::get('192.168.214.103:5000/initData');
+    //     return $response;
+    // });
 
-// Route::get('fcapi/initData', function () {
-//     $response = Http::get('192.168.214.103:5000/initData');
-//     return $response;
-// });
-
-// CORS enabled temp solution to handle FC api calls. This is used by the front-end developer for his local dev workflow
-Route::middleware(['cors'])->group(function () {
-    // http://172.20.215.102:8008/fcapi-open/tripsGPS
-    Route::get('fcapi-open/tripsGPS', function () {
-        // $response = Http::get('192.168.214.103:5000/trips');
-        $response = Http::get('192.168.214.103:5001/tripsGPS');
-        return $response;
+    // CORS enabled temp solution to handle FC api calls. This is used by the front-end developer for his local dev workflow
+    Route::middleware(['cors'])->group(function () {
+        // http://172.20.215.102:8008/fcapi-open/tripsGPS
+        Route::get('fcapi-open/tripsGPS', function () {
+            // $response = Http::get('192.168.214.103:5000/trips');
+            $response = Http::get('192.168.214.103:5001/tripsGPS');
+            return $response;
+        });
+        Route::get('fcapi-open/trips', function () {
+            // $response = Http::get('192.168.214.103:5000/trips');
+            $response = Http::get('192.168.214.103:5001/trips?start_time=2025-02-10T08:00:00&end_time=2025-02-25T22:59:00');
+            return $response;
+        });
+        Route::get('fcapi-open/initData', function () {
+            // $response = Http::get('192.168.214.103:5000/trips');
+            $response = Http::get('192.168.214.103:5001/initData');
+            return $response;
+        });
+        Route::get('fcapi-open/tripData', function (Request $request) {
+            $response = Http::get('192.168.214.103:5001/tripData?trip_id="'.$request->get('trip_id').'"');
+            return $response;
+        });
     });
-    Route::get('fcapi-open/trips', function () {
-        // $response = Http::get('192.168.214.103:5000/trips');
-        $response = Http::get('192.168.214.103:5001/trips?start_time=2025-02-10T08:00:00&end_time=2025-02-25T22:59:00');
-        return $response;
-    });
-    Route::get('fcapi-open/initData', function () {
-        // $response = Http::get('192.168.214.103:5000/trips');
-        $response = Http::get('192.168.214.103:5001/initData');
-        return $response;
-    });
-    Route::get('fcapi-open/tripData', function (Request $request) {
-        $response = Http::get('192.168.214.103:5001/trips?ids=["'.$request->get('id').'"]');
-        return $response;
-    });
-});
+}
 
 require __DIR__ . '/auth.php';

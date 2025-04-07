@@ -34,6 +34,7 @@ async function fetchTripsAndRender() {
 //fetches trip data and renders them on the map.
 // ----------------------------------------------------------------------------------
 function renderScooterTrips(trips) { 
+    alert(trips.length+' trips found'); // Alert the number of trips found
     require([
         "esri/config",
         "esri/Map",
@@ -759,26 +760,33 @@ function parseDate(dateStr) {
 // Find global MBR of the trips
 // ------------------------------------------------------------------------------
 function findGlobalMBR(trips) {
-    gminx=trips[0].mbr.min_lon;
-    gminy=trips[0].mbr.min_lat;
-    gmaxx=trips[0].mbr.max_lon;
-    gmaxy=trips[0].mbr.max_lat;
+    if (!trips || trips.length === 0) {
+        gminx=-98.63289997401928;
+        gminy=29.57896141805267;
+        gmaxx=-98.60818073573806;
+        gmaxy=29.588403557584137;
+    } else {
+        gminx=trips[0].mbr.min_lon;
+        gminy=trips[0].mbr.min_lat;
+        gmaxx=trips[0].mbr.max_lon;
+        gmaxy=trips[0].mbr.max_lat;
 
-    // Add polylines for each trip to the polylineLayer
-    trips.forEach((trip, i) => {
-        if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
-            if(gminx>trip.mbr.min_lon)
-                gminx=trip.mbr.min_lon;
-            if(gminy>trip.mbr.min_lat)
-                gminy=trip.mbr.min_lat;
-            if(gmaxx<trip.mbr.max_lon)
-                gmaxx=trip.mbr.max_lon;
-            if(gmaxy<trip.mbr.max_lat)
-                gmaxy=trip.mbr.max_lat;
-        }
-        // console.log(trip.mbr.min_lon+" "+trip.mbr.min_lat+" "+trip.mbr.max_lon+" "+trip.mbr.max_lat);
-    });
+        // Add polylines for each trip to the polylineLayer
+        trips.forEach((trip, i) => {
+            if (typeof trip.sensor_data.longitude[0] === 'number' && typeof trip.sensor_data.latitude[0] === 'number') {
+                if(gminx>trip.mbr.min_lon)
+                    gminx=trip.mbr.min_lon;
+                if(gminy>trip.mbr.min_lat)
+                    gminy=trip.mbr.min_lat;
+                if(gmaxx<trip.mbr.max_lon)
+                    gmaxx=trip.mbr.max_lon;
+                if(gmaxy<trip.mbr.max_lat)
+                    gmaxy=trip.mbr.max_lat;
+            }
+            // console.log(trip.mbr.min_lon+" "+trip.mbr.min_lat+" "+trip.mbr.max_lon+" "+trip.mbr.max_lat);
+        });
     // console.log(gminx+" "+gminy+" "+gmaxx+" "+gmaxy);
+    }
 }
 
 // ------------------------------------------------------------------------------
@@ -827,7 +835,7 @@ function getScooterTripAllCont(Graphic, trip, tripCount, tid, first) {
         content: () => {
         // Dynamically fetch data for the chart
         tripID = trip.trip_id;
-        return fetch(url+'/tripData?id='+tripID)
+        return fetch(url+'/tripData?trip_id='+tripID)
             .then(response => response.json())
             .then(data => {
                 // console.log(data[0])

@@ -87,7 +87,7 @@ class InterfcapiController extends Controller
             // $response = Http::get($this->url.'/tripsGPS');
             // $response = Http::get($this->url.'/tripsGPS?ids=["'.$request->get('id').'"]');
             // $response = Http::get($this->url.'/trips?ids=["'.$request->get('id').'"]');
-            $response = Http::get($this->url.'/tripData?trip_id="'.$request->get('id').'"');
+            $response = Http::get($this->url.'/tripData?trip_id="'.$request->get('trip_id').'"');
             return $response;
         }
         // not found. Has not access to the trips
